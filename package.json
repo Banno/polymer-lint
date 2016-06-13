@@ -1,0 +1,14 @@
+{
+  "name": "banno-polymer-lint",
+  "version": "1.0.0",
+  "description": "Banno Polymer Linter",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jordan Running <jordan.running@banno.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "parse5": "^2.1.5"
+  }
+}
