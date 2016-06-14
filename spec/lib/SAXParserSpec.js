@@ -47,5 +47,9 @@ describe('SAXParser', () => {
 
       file.pipe(parser);
     });
+
+    it('importTag is emitted');
+    it('customElementStartTag is emitted');
+    it('customElementEndTag is emitted');
   });
 });

@@ -12,7 +12,7 @@ describe('Linter', () => {
     </dom-module>
   `;
 
-  const metadata = { filename: 'foo-file' };
+  const context = { filename: 'foo-file' };
 
   beforeEach(() => {
     Linter = require('../../lib/Linter');
@@ -53,11 +53,8 @@ describe('Linter', () => {
 
         const args = lintStream.calls.argsFor(0);
 
-        // args[0] = stream
         expect(args[0]).toEqual(dummyFileStream);
-
-        // args[1] = metadata
-        expect(args[1]).toEqual({ filename });
+        expect(args[1]).toEqual({ filename: filename });
       });
 
       it('returns the Promise returned by lintStream', () => {
@@ -95,7 +92,7 @@ describe('Linter', () => {
       });
 
       it('invokes each of the rules', (done) => {
-        linter.lintStream(dummyFileStream, metadata).then(() => {
+        linter.lintStream(dummyFileStream, context).then(() => {
           const calls = dummyRule.calls;
           expect(calls.count()).toEqual(2);
           done();
@@ -103,9 +100,9 @@ describe('Linter', () => {
       });
 
       it('invokes the rules with the expected arguments', (done) => {
-        linter.lintStream(dummyFileStream, metadata).then(() => {
+        linter.lintStream(dummyFileStream, context).then(() => {
           const args = dummyRule.calls.argsFor(0);
-          expect(args[0]).toEqual(metadata.filename);
+          expect(args[0]).toEqual(context);
           expect(args[1].constructor.name).toEqual('SAXParser');
           expect(args[2]).toEqual(jasmine.any(Function));
           done();
@@ -129,7 +126,7 @@ describe('Linter', () => {
 
         linter = new Linter({ [ruleName]: dummyRule });
 
-        const promise = linter.lintStream(dummyFileStream, metadata);
+        const promise = linter.lintStream(dummyFileStream, context);
         const errsPrepended = dummyErrors.map((args) => [ ruleName, ...args ]);
 
         expect(promise).toResolveWith(errsPrepended, done);
