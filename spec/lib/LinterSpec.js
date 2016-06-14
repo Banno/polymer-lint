@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 describe('Linter', () => {
-  let Linter, linter, dummyFileStream, dummyLinter, dummyLinters;
+  let Linter, linter, dummyFileStream, dummyRule, dummyRules;
 
   const component = `
     <dom-module id="foo-module">
@@ -19,18 +19,18 @@ describe('Linter', () => {
     dummyFileStream = helpers.streamFromString(component);
     spyOn(fs, 'createReadStream').and.returnValue(dummyFileStream);
 
-    dummyLinter = jasmine.createSpy('dummyLinter');
-    dummyLinters = {
-      'dummy-linter': dummyLinter,
-      'dummy-linter-2': dummyLinter,
+    dummyRule = jasmine.createSpy('dummyRule');
+    dummyRules = {
+      'dummy-rule': dummyRule,
+      'dummy-rule-2': dummyRule,
     };
 
-    linter = new Linter(dummyLinters);
+    linter = new Linter(dummyRules);
   });
 
   describe('constructor', () => {
-    it('accepts an object with linter names and functions', () => {
-      expect(linter.enabledLinters).toEqual(dummyLinters);
+    it('accepts an object with rule names and functions', () => {
+      expect(linter.enabledRules).toEqual(dummyRules);
     });
   });
 
@@ -94,17 +94,17 @@ describe('Linter', () => {
         expect(res).toEqual(jasmine.any(Promise));
       });
 
-      it('invokes each of the linters', (done) => {
+      it('invokes each of the rules', (done) => {
         linter.lintStream(dummyFileStream, metadata).then(() => {
-          const calls = dummyLinter.calls;
+          const calls = dummyRule.calls;
           expect(calls.count()).toEqual(2);
           done();
         });
       });
 
-      it('invokes the linters with the expected arguments', (done) => {
+      it('invokes the rules with the expected arguments', (done) => {
         linter.lintStream(dummyFileStream, metadata).then(() => {
-          const args = dummyLinter.calls.argsFor(0);
+          const args = dummyRule.calls.argsFor(0);
           expect(args[0]).toEqual(metadata.filename);
           expect(args[1].constructor.name).toEqual('SAXParser');
           expect(args[2]).toEqual(jasmine.any(Function));
@@ -112,25 +112,25 @@ describe('Linter', () => {
         });
       });
 
-      it('resolves the Promise with an Array of errors with the linter ' +
+      it('resolves the Promise with an Array of errors with the rule ' +
          'name prepended', (done) => {
-        const linterName = 'dummy-linter';
+        const ruleName = 'dummy-rule';
 
         const dummyErrors = [
           [ 'Dummy message 1', { foo: 1 } ],
           [ 'Dummy message 2', { foo: 2 } ],
         ];
 
-        dummyLinter = (filename, parser, onError) => {
+        dummyRule = (filename, parser, onError) => {
           for(const err of dummyErrors) {
             onError(...err);
           }
         };
 
-        linter = new Linter({ [linterName]: dummyLinter });
+        linter = new Linter({ [ruleName]: dummyRule });
 
         const promise = linter.lintStream(dummyFileStream, metadata);
-        const errsPrepended = dummyErrors.map((args) => [ linterName, ...args ]);
+        const errsPrepended = dummyErrors.map((args) => [ ruleName, ...args ]);
 
         expect(promise).toResolveWith(errsPrepended, done);
       });
