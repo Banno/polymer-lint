@@ -10,9 +10,21 @@ const examples = fs.readdirSync(examplesPath)
   .map((filename) => path.join(examplesPath, filename));
 
 Linter.lintFiles(examples, rules)
-  .then((errors) => {
+  .then((res) => {
     console.log('done');
-    console.log(errors);
+
+    for (const { context, errors } of res) {
+      console.log(context.filename);
+
+      if (errors.length) {
+        for (const [ rule, message ] of errors) {
+          console.log(`- ${rule} - ${message}`);
+        }
+      } else {
+        console.log('- No errors');
+      }
+      console.log();
+    }
   })
   .catch((err) => {
     console.log('ERROR!', err);

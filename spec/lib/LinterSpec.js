@@ -14,6 +14,11 @@ describe('Linter', () => {
 
   const context = { filename: 'foo-file' };
 
+  const dummyErrors = [
+    [ 'Dummy message 1', { foo: 1 } ],
+    [ 'Dummy message 2', { foo: 2 } ],
+  ];
+
   beforeEach(() => {
     Linter = require('../../lib/Linter');
     dummyFileStream = helpers.streamFromString(component);
@@ -54,12 +59,20 @@ describe('Linter', () => {
         const args = lintStream.calls.argsFor(0);
 
         expect(args[0]).toEqual(dummyFileStream);
-        expect(args[1]).toEqual({ filename: filename });
+        expect(args[1]).toEqual({ filename });
       });
 
-      it('returns the Promise returned by lintStream', () => {
-        const res = linter.lintFile('baz.html');
-        expect(res).toEqual(dummyPromise);
+      it('returns a Promise that is resolved with an object of the ' +
+         'form { errors, context }', (done) => {
+        let resolve;
+
+        dummyPromise = new Promise(_resolve => { resolve = _resolve; });
+        lintStream.and.returnValue(dummyPromise);
+
+        expect(linter.lintFile(context.filename))
+          .toResolveWith({ errors: dummyErrors, context }, done);
+
+        resolve(dummyErrors);
       });
     });
 
@@ -112,11 +125,6 @@ describe('Linter', () => {
       it('resolves the Promise with an Array of errors with the rule ' +
          'name prepended', (done) => {
         const ruleName = 'dummy-rule';
-
-        const dummyErrors = [
-          [ 'Dummy message 1', { foo: 1 } ],
-          [ 'Dummy message 2', { foo: 2 } ],
-        ];
 
         dummyRule = (filename, parser, onError) => {
           for(const err of dummyErrors) {
