@@ -1,8 +1,7 @@
 const stream = require('stream');
-global.helpers = (global.helpers || {});
 
 /**
- * streamFromString
+ * helpers.streamFromString
  * @param {string} string
  * @returns {stream.Readable} A Readable stream that will emit the given string
  */
@@ -12,6 +11,4 @@ function streamFromString(string) {
   return s;
 }
 
-beforeAll(() => {
-  global.helpers.streamFromString = streamFromString;
-});
+module.exports = streamFromString;

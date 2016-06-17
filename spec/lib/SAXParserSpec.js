@@ -77,5 +77,41 @@ describe('SAXParser', () => {
 
       file.pipe(parser);
     });
+
+    it('linterDirective', (done) => {
+      file = helpers.streamFromString(`
+        <dom-module id="foo">
+          <!-- bplint-disable -->
+          <!-- bplint-disable arg1 -->
+          <!-- bplint-disable arg1, -->
+          <!--bplint-disable arg1, arg2-->
+          <!--bplint-disable arg1,,arg2-->
+          <!-- bplint-disable   arg1 arg2 -->
+        </dom-module>
+      `);
+
+      const expectedEvents = [
+        [ 'bplint-disable', [] ],
+        [ 'bplint-disable', ['arg1'] ],
+        [ 'bplint-disable', ['arg1'] ],
+        [ 'bplint-disable', ['arg1', 'arg2'] ],
+        [ 'bplint-disable', ['arg1', 'arg2'] ],
+        [ 'bplint-disable', ['arg1 arg2'] ],
+      ];
+
+      const actualEvents = [];
+
+      parser.on('linterDirective', (name, args) =>
+        actualEvents.push([ name, args ])
+      );
+
+
+      parser.on('end', () => {
+        expect(actualEvents).toEqual(expectedEvents);
+        done();
+      });
+
+      file.pipe(parser);
+    });
   });
 });

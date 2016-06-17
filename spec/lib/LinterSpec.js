@@ -115,7 +115,7 @@ describe('Linter', () => {
       it('invokes the rules with the expected arguments', (done) => {
         linter.lintStream(dummyFileStream, context).then(() => {
           const args = dummyRule.calls.argsFor(0);
-          expect(args[0]).toEqual(context);
+          expect(args[0]).toEqual(jasmine.objectContaining(context));
           expect(args[1].constructor.name).toEqual('SAXParser');
           expect(args[2]).toEqual(jasmine.any(Function));
           done();
@@ -127,7 +127,7 @@ describe('Linter', () => {
         const ruleName = 'dummy-rule';
 
         dummyRule = (filename, parser, onError) => {
-          for(const err of dummyErrors) {
+          for (const err of dummyErrors) {
             onError(...err);
           }
         };
