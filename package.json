@@ -9,7 +9,8 @@
   "author": "Jordan Running <jordan.running@banno.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "parse5": "^2.1.5"
+    "parse5": "^2.1.5",
+    "sprintf-js": "^1.0.3"
   },
   "devDependencies": {
     "jasmine": "^2.4.1"

@@ -35,7 +35,7 @@ describe('component-name-doesnt-match-filename', () => {
 
       expect(onError).toHaveBeenCalledTimes(1);
       expect(onError).toHaveBeenCalledWith({
-        message: `Expected '${filename}' to declare component ` +
+        message: `Expected '${expectedComponentName}.html' to declare component ` +
         `'${expectedComponentName}' but it declared '${componentName}'`,
         location,
       });

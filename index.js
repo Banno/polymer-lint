@@ -9,24 +9,12 @@ const examplesPath = path.join(__dirname, './example');
 const examples = fs.readdirSync(examplesPath)
   .map((filename) => path.join(examplesPath, filename));
 
-const inspect = require('util').inspect;
+const ConsoleReporter = require('./lib/reporters/ConsoleReporter');
 
 Linter.lintFiles(examples, rules)
-  .then((res) => {
-    console.log('done');
-
-    for (const { errors, context } of res) {
-      console.log(context.filename);
-
-      if (errors.length) {
-        for (const { rule, message } of errors) {
-          console.log(`- ${rule} - ${message}`);
-        }
-      } else {
-        console.log('- No errors');
-      }
-      console.log();
-    }
+  .then(res => {
+    const reporter = new ConsoleReporter;
+    reporter.report(res);
   })
   .catch((err) => {
     console.log('ERROR!', err);
