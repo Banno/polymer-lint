@@ -12,7 +12,6 @@
     "parse5": "^2.1.5"
   },
   "devDependencies": {
-    "jasmine": "^2.4.1",
-    "jasmine-node-promise-matchers": "0.0.3"
+    "jasmine": "^2.4.1"
   }
 }

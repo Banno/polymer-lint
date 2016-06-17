@@ -9,15 +9,17 @@ const examplesPath = path.join(__dirname, './example');
 const examples = fs.readdirSync(examplesPath)
   .map((filename) => path.join(examplesPath, filename));
 
+const inspect = require('util').inspect;
+
 Linter.lintFiles(examples, rules)
   .then((res) => {
     console.log('done');
 
-    for (const { context, errors } of res) {
+    for (const { errors, context } of res) {
       console.log(context.filename);
 
       if (errors.length) {
-        for (const [ rule, message ] of errors) {
+        for (const { rule, message } of errors) {
           console.log(`- ${rule} - ${message}`);
         }
       } else {

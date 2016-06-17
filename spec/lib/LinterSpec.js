@@ -15,8 +15,8 @@ describe('Linter', () => {
   const context = { filename: 'foo-file' };
 
   const dummyErrors = [
-    [ 'Dummy message 1', { foo: 1 } ],
-    [ 'Dummy message 2', { foo: 2 } ],
+    { message: 'Dummy message 1', location: { line: 1, col: 1 } },
+    { message: 'Dummy message 2', location: { line: 2, col: 2 } },
   ];
 
   beforeEach(() => {
@@ -62,17 +62,19 @@ describe('Linter', () => {
         expect(args[1]).toEqual({ filename });
       });
 
-      it('returns a Promise that is resolved with an object of the ' +
-         'form { errors, context }', (done) => {
+      it('returns a Promise that is resolved with value the Promise returned ' +
+         'by lintStream resolves with', (done) => {
         let resolve;
 
         dummyPromise = new Promise(_resolve => { resolve = _resolve; });
         lintStream.and.returnValue(dummyPromise);
 
-        expect(linter.lintFile(context.filename))
-          .toResolveWith({ errors: dummyErrors, context }, done);
+        linter.lintFile(context.filename).then((...args) => {
+          expect(...args).toEqual({ errors: dummyErrors, context: {} });
+          done();
+        });
 
-        resolve(dummyErrors);
+        resolve({ errors: dummyErrors, context: {} });
       });
     });
 
@@ -122,22 +124,28 @@ describe('Linter', () => {
         });
       });
 
-      it('resolves the Promise with an Array of errors with the rule ' +
-         'name prepended', (done) => {
+      it('resolves the Promise with an Array of errors with added ' +
+         '\'name\' property', (done) => {
         const ruleName = 'dummy-rule';
 
         dummyRule = (filename, parser, onError) => {
           for (const err of dummyErrors) {
-            onError(...err);
+            onError(err);
           }
         };
 
         linter = new Linter({ [ruleName]: dummyRule });
 
         const promise = linter.lintStream(dummyFileStream, context);
-        const errsPrepended = dummyErrors.map((args) => [ ruleName, ...args ]);
+        const errsWithNames = dummyErrors.map(({ message, location }) =>
+          ({ rule: ruleName, message, location }));
 
-        expect(promise).toResolveWith(errsPrepended, done);
+        promise.then(({ errors, context: actualContext }) => {
+          expect(errors).toEqual(errsWithNames);
+          expect(actualContext.filename).toEqual(context.filename);
+          expect(actualContext.stack.constructor.name).toEqual('ScopedDirectiveStack');
+          done();
+        });
       });
     });
   });

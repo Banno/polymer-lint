@@ -34,8 +34,11 @@ describe('component-name-doesnt-match-filename', () => {
       mockParser.emit('domModuleStartTag', componentName, { id: componentName }, false, location);
 
       expect(onError).toHaveBeenCalledTimes(1);
-      expect(onError).toHaveBeenCalledWith(`Expected '${filename}' to declare component ` +
-        `'${expectedComponentName}' but it declared '${componentName}'`, location);
+      expect(onError).toHaveBeenCalledWith({
+        message: `Expected '${filename}' to declare component ` +
+        `'${expectedComponentName}' but it declared '${componentName}'`,
+        location,
+      });
     });
   });
 });

@@ -31,8 +31,10 @@ describe('missing-imports', () => {
       mockParser.emit('customElementStartTag', 'bad-component', {}, false, location);
 
       expect(onError).toHaveBeenCalledTimes(1);
-      expect(onError).toHaveBeenCalledWith(
-        'Custom element <bad-component> used but not imported', location);
+      expect(onError).toHaveBeenCalledWith({
+        message: 'Custom element <bad-component> used but not imported',
+        location,
+      });
     });
   });
 });
