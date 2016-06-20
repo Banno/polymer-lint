@@ -17,6 +17,8 @@ describe('ConsoleReporter', () => {
       const reporter = new ConsoleReporter(mockOut);
       expect(reporter.out).toBe(mockOut);
     });
+
+    it('accepts options');
   });
 
   describe('instance methods', () => {
@@ -102,6 +104,10 @@ describe('ConsoleReporter', () => {
           expect(mockOut.write)
             .toHaveBeenCalledWith(`  2:20 This has 17 chars rule-b\n`);
         });
+      });
+
+      describe('when color is enabled', () => {
+        it('');
       });
     });
   });
