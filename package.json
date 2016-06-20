@@ -9,6 +9,8 @@
   "author": "Jordan Running <jordan.running@banno.com>",
   "license": "Apache-2.0",
   "dependencies": {
+    "glob": "^7.0.4",
+    "optionator": "^0.8.1",
     "parse5": "^2.1.5",
     "sprintf-js": "^1.0.3"
   },
