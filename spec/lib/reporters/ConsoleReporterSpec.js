@@ -34,11 +34,11 @@ describe('ConsoleReporter', () => {
     const errors = [
       { rule: 'rule-a',
         message: 'This message has 30 characters',
-        location: { line: 100, col: 5 },
+        location: { line: 2, col: 20 },
       },
       { rule: 'rule-b',
         message: 'This has 17 chars',
-        location: { line: 2, col: 20 },
+        location: { line: 100, col: 5 },
       },
     ];
 
@@ -81,8 +81,8 @@ describe('ConsoleReporter', () => {
       it('writes the errors with the expected formatting', () => {
         reporter.reportFile(errors, context);
 
-        [ `  100:5  This message has 30 characters rule-a\n`,
-          `    2:20 This has 17 chars              rule-b\n`,
+        [ '    2:20 This message has 30 characters rule-a\n',
+          '  100:5  This has 17 chars              rule-b\n',
         ].forEach(output => {
           expect(mockOut.write).toHaveBeenCalledWith(output);
         });
@@ -102,12 +102,63 @@ describe('ConsoleReporter', () => {
 
         it('writes errors for other rules with the expected formatting', () => {
           expect(mockOut.write)
-            .toHaveBeenCalledWith(`  2:20 This has 17 chars rule-b\n`);
+            .toHaveBeenCalledWith('  100:5 This has 17 chars rule-b\n');
         });
       });
 
-      describe('when color is enabled', () => {
-        it('');
+      describe('when the color option', () => {
+        const ESC = '\u001b';
+        let reporter;
+
+        describe('is not specified', () => {
+          describe('and the output object has an isTTY option that is truthy', () => {
+            beforeEach(() => {
+              mockOut.isTTY = true;
+              reporter = new ConsoleReporter(mockOut, {});
+            });
+
+            it('styles its output', () => {
+              reporter.reportFile(errors, context);
+              expect(mockOut.write)
+                .toHaveBeenCalledWith(`${ESC}[4mbar/hello.html${ESC}[24m\n`);
+            });
+          });
+
+          describe('and the output object has an iSTTY option that is falsy', () => {
+            beforeEach(() => {
+              delete mockOut.isTTY;
+              reporter = new ConsoleReporter(mockOut, {});
+            });
+
+            it('does not style its output', () => {
+              reporter.reportFile(errors, context);
+              expect(mockOut.write).toHaveBeenCalledWith('bar/hello.html\n');
+            });
+          });
+        });
+
+        describe('is false', () => {
+          beforeEach(() => {
+            reporter = new ConsoleReporter(mockOut, { color: false });
+          });
+
+          it('does not style its output', () => {
+            reporter.reportFile(errors, context);
+            expect(mockOut.write).toHaveBeenCalledWith('bar/hello.html\n');
+          });
+        });
+
+        describe('is true', () => {
+          beforeEach(() => {
+            reporter = new ConsoleReporter(mockOut, { color: true });
+          });
+
+          it('styles its output', () => {
+            reporter.reportFile(errors, context);
+            expect(mockOut.write)
+              .toHaveBeenCalledWith(`${ESC}[4mbar/hello.html${ESC}[24m\n`);
+          });
+        });
       });
     });
   });

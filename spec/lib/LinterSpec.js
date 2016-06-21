@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 describe('Linter', () => {
-  let Linter, linter, dummyFileStream, dummyRule, dummyRules;
+  let Linter, linter, dummyFileStream, rule, rules, errors;
 
   const component = `
     <dom-module id="foo-module">
@@ -14,28 +14,28 @@ describe('Linter', () => {
 
   const context = { filename: 'foo-file' };
 
-  const dummyErrors = [
-    { message: 'Dummy message 1', location: { line: 1, col: 1 } },
-    { message: 'Dummy message 2', location: { line: 2, col: 2 } },
-  ];
-
   beforeEach(() => {
+    errors = [
+      { message: 'Dummy message 1', location: { line: 1, col: 1 } },
+      { message: 'Dummy message 2', location: { line: 2, col: 2 } },
+    ];
+
     Linter = require('../../lib/Linter');
     dummyFileStream = helpers.streamFromString(component);
     spyOn(fs, 'createReadStream').and.returnValue(dummyFileStream);
 
-    dummyRule = jasmine.createSpy('dummyRule');
-    dummyRules = {
-      'dummy-rule': dummyRule,
-      'dummy-rule-2': dummyRule,
+    rule = jasmine.createSpy('rule');
+    rules = {
+      'dummy-rule': rule,
+      'dummy-rule-2': rule,
     };
 
-    linter = new Linter(dummyRules);
+    linter = new Linter(rules);
   });
 
   describe('constructor', () => {
     it('accepts an object with rule names and functions', () => {
-      expect(linter.enabledRules).toEqual(dummyRules);
+      expect(linter.enabledRules).toEqual(rules);
     });
   });
 
@@ -70,11 +70,11 @@ describe('Linter', () => {
         lintStream.and.returnValue(dummyPromise);
 
         linter.lintFile(context.filename).then((...args) => {
-          expect(...args).toEqual({ errors: dummyErrors, context: {} });
+          expect(...args).toEqual({ errors, context: {} });
           done();
         });
 
-        resolve({ errors: dummyErrors, context: {} });
+        resolve({ errors, context: {} });
       });
     });
 
@@ -108,7 +108,7 @@ describe('Linter', () => {
 
       it('invokes each of the rules', (done) => {
         linter.lintStream(dummyFileStream, context).then(() => {
-          const calls = dummyRule.calls;
+          const calls = rule.calls;
           expect(calls.count()).toEqual(2);
           done();
         });
@@ -116,7 +116,7 @@ describe('Linter', () => {
 
       it('invokes the rules with the expected arguments', (done) => {
         linter.lintStream(dummyFileStream, context).then(() => {
-          const args = dummyRule.calls.argsFor(0);
+          const args = rule.calls.argsFor(0);
           expect(args[0]).toEqual(jasmine.objectContaining(context));
           expect(args[1].constructor.name).toEqual('SAXParser');
           expect(args[2]).toEqual(jasmine.any(Function));
@@ -124,27 +124,45 @@ describe('Linter', () => {
         });
       });
 
-      it('resolves the Promise with an Array of errors with added ' +
-         '\'name\' property', (done) => {
+      describe('resolves the returned Promise', () => {
         const ruleName = 'dummy-rule';
 
-        dummyRule = (filename, parser, onError) => {
-          for (const err of dummyErrors) {
-            onError(err);
-          }
-        };
+        it('with an Array of errors with added \'name\' property', (done) => {
+          rule = (filename, parser, onError) => {
+            for (const err of errors) { onError(err); }
+          };
 
-        linter = new Linter({ [ruleName]: dummyRule });
+          linter = new Linter({ [ruleName]: rule });
 
-        const promise = linter.lintStream(dummyFileStream, context);
-        const errsWithNames = dummyErrors.map(({ message, location }) =>
-          ({ rule: ruleName, message, location }));
+          const promise = linter.lintStream(dummyFileStream, context);
+          const errsWithNames = errors.map(({ message, location }) =>
+            ({ rule: ruleName, message, location }));
 
-        promise.then(({ errors, context: actualContext }) => {
-          expect(errors).toEqual(errsWithNames);
-          expect(actualContext.filename).toEqual(context.filename);
-          expect(actualContext.stack.constructor.name).toEqual('ScopedDirectiveStack');
-          done();
+          promise.then(({ errors, context: actualContext }) => {
+            expect(errors).toEqual(errsWithNames);
+            expect(actualContext.filename).toEqual(context.filename);
+            expect(actualContext.stack.constructor.name).toEqual('ScopedDirectiveStack');
+            done();
+          });
+        });
+
+        it('with an Array of errors sorted by source location', (done) => {
+          const errorsOutOfOrder = errors.slice().reverse();
+
+          rule = (filename, parser, onError) => {
+            for (const err of errorsOutOfOrder) { onError(err); }
+          };
+
+          linter = new Linter({ [ruleName]: rule });
+
+          const promise = linter.lintStream(dummyFileStream, context);
+          const expectedLocations = errors.map(({ location }) => location);
+
+          promise.then(({ errors: actualErrors }) => {
+            expect(actualErrors.map(({ location }) => location))
+              .toEqual(expectedLocations);
+            done();
+          });
         });
       });
     });
