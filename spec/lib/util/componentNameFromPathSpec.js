@@ -8,7 +8,7 @@ describe('componentNameFromPath', () => {
         '/foo/bar/baz-component',
         'baz-component.html',
         'baz-component',
-      ]
+      ];
 
       for (const path of paths) {
         expect(componentNameFromPath(path)).toEqual('baz-component');

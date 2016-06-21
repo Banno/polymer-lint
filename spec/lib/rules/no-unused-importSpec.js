@@ -7,7 +7,7 @@ describe('no-unused-import', () => {
   const componentName = 'foo-component';
 
   beforeEach(() => {
-    mockParser = new EventEmitter;
+    mockParser = new EventEmitter();
     onError = jasmine.createSpy('onError');
     noUnusedImport({}, mockParser, onError);
     mockParser.emit('importTag', `/foo/bar/${componentName}.html`, location);

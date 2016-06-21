@@ -6,7 +6,7 @@ describe('no-missing-import', () => {
   let mockParser, onError;
 
   beforeEach(() => {
-    mockParser = new EventEmitter;
+    mockParser = new EventEmitter();
     onError = jasmine.createSpy('onError');
 
     noMissingImport({}, mockParser, onError);

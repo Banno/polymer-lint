@@ -8,5 +8,6 @@ function handleError(err) {
 process.on('uncaughtException', handleError);
 process.on('unhandledRejection', handleError);
 
-Promise.resolve(CLI.execute(process.argv))
-  .then(exitCode => (process.exitCode = exitCode));
+Promise.resolve(CLI.execute(process.argv)).then(exitCode => {
+  process.exitCode = exitCode;
+});

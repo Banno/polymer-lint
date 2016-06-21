@@ -25,15 +25,14 @@ describe('SAXParser', () => {
       </dom-module>
     `;
 
-    let file, listener, parser;
+    let file, parser;
 
     beforeEach(() => {
       file = helpers.streamFromString(component);
-      listener = jasmine.createSpy();
       parser = new SAXParser();
     });
 
-    it('domModuleStartTag', (done) => {
+    it('domModuleStartTag', done => {
       parser.on('domModuleStartTag', (name, attrs) => {
         expect(name).toEqual(moduleId);
         expect(attrs).toEqual(attributesContaining({ id: moduleId }));
@@ -44,13 +43,13 @@ describe('SAXParser', () => {
       file.pipe(parser);
     });
 
-    it('domModuleEndTag', (done) => {
+    it('domModuleEndTag', done => {
       parser.on('domModuleEndTag', done);
       file.pipe(parser);
     });
 
-    it('importTag', (done) => {
-      parser.on('importTag', (href) => {
+    it('importTag', done => {
+      parser.on('importTag', href => {
         expect(href).toEqual(importHref);
         done();
       });
@@ -58,7 +57,7 @@ describe('SAXParser', () => {
       file.pipe(parser);
     });
 
-    it('customElementStartTag', (done) => {
+    it('customElementStartTag', done => {
       parser.on('customElementStartTag', (name, attrs, selfClosing) => {
         expect(name).toEqual(moduleId);
         expect(attrs).toEqual(attributesContaining({ foo: 'bar' }));
@@ -69,8 +68,8 @@ describe('SAXParser', () => {
       file.pipe(parser);
     });
 
-    it('customElementEndTag', (done) => {
-      parser.on('customElementEndTag', (name) => {
+    it('customElementEndTag', done => {
+      parser.on('customElementEndTag', name => {
         expect(name).toEqual(moduleId);
         done();
       });
@@ -78,7 +77,7 @@ describe('SAXParser', () => {
       file.pipe(parser);
     });
 
-    it('linterDirective', (done) => {
+    it('linterDirective', done => {
       file = helpers.streamFromString(`
         <dom-module id="foo">
           <!-- bplint-disable -->
@@ -104,7 +103,6 @@ describe('SAXParser', () => {
       parser.on('linterDirective', (name, args) =>
         actualEvents.push([ name, args ])
       );
-
 
       parser.on('end', () => {
         expect(actualEvents).toEqual(expectedEvents);

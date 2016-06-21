@@ -63,10 +63,12 @@ describe('Linter', () => {
       });
 
       it('returns a Promise that is resolved with value the Promise returned ' +
-         'by lintStream resolves with', (done) => {
+         'by lintStream resolves with', done => {
         let resolve;
 
-        dummyPromise = new Promise(_resolve => { resolve = _resolve; });
+        dummyPromise = new Promise(_resolve => {
+          resolve = _resolve;
+        });
         lintStream.and.returnValue(dummyPromise);
 
         linter.lintFile(context.filename).then((...args) => {
@@ -106,7 +108,7 @@ describe('Linter', () => {
         expect(res).toEqual(jasmine.any(Promise));
       });
 
-      it('invokes each of the rules', (done) => {
+      it('invokes each of the rules', done => {
         linter.lintStream(dummyFileStream, context).then(() => {
           const calls = rule.calls;
           expect(calls.count()).toEqual(2);
@@ -114,7 +116,7 @@ describe('Linter', () => {
         });
       });
 
-      it('invokes the rules with the expected arguments', (done) => {
+      it('invokes the rules with the expected arguments', done => {
         linter.lintStream(dummyFileStream, context).then(() => {
           const args = rule.calls.argsFor(0);
           expect(args[0]).toEqual(jasmine.objectContaining(context));
@@ -127,9 +129,11 @@ describe('Linter', () => {
       describe('resolves the returned Promise', () => {
         const ruleName = 'dummy-rule';
 
-        it('with an Array of errors with added \'name\' property', (done) => {
+        it('with an Array of errors with added \'name\' property', done => {
           rule = (filename, parser, onError) => {
-            for (const err of errors) { onError(err); }
+            for (const err of errors) {
+              onError(err);
+            }
           };
 
           linter = new Linter({ [ruleName]: rule });
@@ -146,11 +150,13 @@ describe('Linter', () => {
           });
         });
 
-        it('with an Array of errors sorted by source location', (done) => {
+        it('with an Array of errors sorted by source location', done => {
           const errorsOutOfOrder = errors.slice().reverse();
 
           rule = (filename, parser, onError) => {
-            for (const err of errorsOutOfOrder) { onError(err); }
+            for (const err of errorsOutOfOrder) {
+              onError(err);
+            }
           };
 
           linter = new Linter({ [ruleName]: rule });

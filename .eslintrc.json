@@ -1,0 +1,20 @@
+{ "extends": "google",
+  "rules": {
+    "array-bracket-spacing": 0,
+    "arrow-body-style": ["error", "as-needed"],
+    "comma-dangle": 0,
+    "dot-notation": 0,
+    "max-len": [2, 120, 2, { "ignoreUrls": true, "ignoreComments": true }],
+    "new-cap": 0,
+    "no-var": "error",
+    "object-curly-spacing": 0,
+    "one-var": [2, { "uninitialized": "always" }],
+    "prefer-arrow-callback": "error",
+    "prefer-const": "error",
+    "prefer-rest-params":"error",
+    "prefer-spread":"error",
+    "prefer-template":"error",
+    "require-jsdoc": 0,
+    "valid-jsdoc": [2, { "requireParamDescription": false, "requireReturnDescription": false }]
+  }
+}

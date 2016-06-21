@@ -7,7 +7,7 @@ describe('style-inside-template', () => {
   let mockParser, onError;
 
   beforeEach(() => {
-    mockParser = new EventEmitter;
+    mockParser = new EventEmitter();
     onError = jasmine.createSpy('onError');
     styleInsideTemplate({}, mockParser, onError);
   });

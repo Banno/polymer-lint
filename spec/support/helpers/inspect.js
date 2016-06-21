@@ -12,7 +12,7 @@ function inspector(options = {}) {
     return strings.reduce((out, s, idx) =>
       `${out}${s}${idx < values.length ? i(values[idx]) : ''}`
     , '');
-  }
+  };
 }
 
 const DEFAULT_INSPECT = inspector();
@@ -49,7 +49,7 @@ const DEFAULT_INSPECT = inspector();
  *
  * @param {string[]|Object} stringsOrOpts
  * @param {...*} values
- * @returns {string}
+ * @return {string}
  */
 function inspect(stringsOrOpts, ...values) {
   if (Array.isArray(stringsOrOpts)) {

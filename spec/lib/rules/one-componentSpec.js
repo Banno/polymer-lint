@@ -5,7 +5,7 @@ describe('one-component', () => {
   let mockParser, onError;
 
   beforeEach(() => {
-    mockParser = new EventEmitter;
+    mockParser = new EventEmitter();
     onError = jasmine.createSpy('onError');
 
     oneComponent({}, mockParser, onError);

@@ -76,7 +76,6 @@ describe('ScopedDirectiveStack', () => {
       });
     });
 
-
     describe('clone', () => {
     });
 
@@ -96,11 +95,11 @@ describe('ScopedDirectiveStack', () => {
       ];
 
       const expectedSnapshots = [
-        [  1, [ {} ] ],
-        [  3, [ {} ] ],
-        [  5, [ {}, { foo: [['xyz']] } ] ],
-        [  7, [ {}, { foo: [['xyz']] } ] ],
-        [  9, [ {}, { foo: [['xyz']] }, { foo: [[]] } ] ],
+        [ 1, [ {} ] ],
+        [ 3, [ {} ] ],
+        [ 5, [ {}, { foo: [['xyz']] } ] ],
+        [ 7, [ {}, { foo: [['xyz']] } ] ],
+        [ 9, [ {}, { foo: [['xyz']] }, { foo: [[]] } ] ],
         [ 11, [ {}, { foo: [['xyz']] }, { foo: [[]], bar: [['abc']] } ] ],
         [ 13, [ {}, { foo: [['xyz']] } ] ],
         [ 15, [ {}, { foo: [['xyz']], baz: [[]] } ] ],
@@ -112,6 +111,7 @@ describe('ScopedDirectiveStack', () => {
       });
 
       for (const [ line, snapshot ] of expectedSnapshots) {
+        /* eslint-disable no-loop-func */
         it(helpers.inspect`returns ${snapshot} for line ${line}`, () => {
           const actual = stack.snapshotAtLocation({ line, col: 1 });
           expect(actual).toEqual(snapshot);

@@ -1,10 +1,11 @@
 {
-  "name": "banno-polymer-lint",
-  "version": "1.0.0",
-  "description": "Banno Polymer Linter",
-  "main": "index.js",
+  "name": "polymer-lint",
+  "version": "0.1.0",
+  "description": "Polymer Linter",
+  "main": "./lib/Linter.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint lib spec; exit 0",
+    "test": "jasmine"
   },
   "author": "Jordan Running <jordan.running@banno.com>",
   "license": "Apache-2.0",
@@ -16,6 +17,9 @@
     "sprintf-js": "^1.0.3"
   },
   "devDependencies": {
+    "eslint": "^2.13.1",
+    "eslint-config-google": "^0.6.0",
+    "eslint-plugin-jasmine": "^1.8.1",
     "jasmine": "^2.4.1"
   }
 }
