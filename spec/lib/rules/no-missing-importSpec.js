@@ -1,15 +1,15 @@
 const EventEmitter = require('events').EventEmitter;
 
-const missingImports = require('../../../lib/rules/missing-imports');
+const noMissingImport = require('../../../lib/rules/no-missing-import');
 
-describe('missing-imports', () => {
+describe('no-missing-import', () => {
   let mockParser, onError;
 
   beforeEach(() => {
     mockParser = new EventEmitter;
     onError = jasmine.createSpy('onError');
 
-    missingImports({}, mockParser, onError);
+    noMissingImport({}, mockParser, onError);
 
     mockParser.emit('importTag', 'good-component-1');
     mockParser.emit('importTag', 'good-component-2');
