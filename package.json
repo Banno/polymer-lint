@@ -22,7 +22,7 @@
     "url": "git+https://github.com/Banno/polymer-lint.git"
   },
   "bugs": {
-    "url": "https://github.com/Banno/polymer-lint/issues",
+    "url": "https://github.com/Banno/polymer-lint/issues"
   },
   "dependencies": {
     "chalk": "^1.1.3",
