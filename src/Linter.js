@@ -1,5 +1,10 @@
 // Linter
 const fs = require('fs');
+const { Buffer } = require('buffer');
+const { Stream, PassThrough } = require('stream');
+const { isString } = require('util');
+
+const { enabledRules } = require('./util');
 const SAXParser = require('./SAXParser');
 const ScopedDirectiveStack = require('./ScopedDirectiveStack');
 
@@ -12,6 +17,7 @@ const ScopedDirectiveStack = require('./ScopedDirectiveStack');
 /**
  * @typedef LintStreamContext
  * @type {Object}
+ * @property {string} filename=
  * @property {ScopedDirectiveStack} stack
  * @memberof Linter
  */
@@ -91,11 +97,12 @@ class Linter {
   }
 
   /**
+   * Lint the contents of the given readable stream
    * @param {external:stream.Readable} stream
-   * @param {{filename: ?string}} [context={}]
+   * @param {LintStreamContext} context
    * @return {Promise<Linter.LintStreamResult|Error>}
    */
-  lintStream(stream, context = {}) {
+  lintStream(stream, context) {
     const parser = new SAXParser({ locationInfo: true });
     const errors = [];
 
@@ -131,17 +138,49 @@ class Linter {
 }
 
 /**
+ * Lint the given files
+ *
  * @function lintFiles
  * @memberof Linter
  * @static
  * @param {string[]} filenames
- * @param {Rules} enabledRules
  * @param {Linter.LinterOptions} [options={}]
+ * @param {string[]} [options.rules=[]] - Names of rules to enable
  * @return {Promise<Linter.LintFileResult[]|Error>}
+ * @see Linter#lintFiles
  */
-Linter.lintFiles = function lintFiles(filenames, enabledRules, options = {}) {
-  const linter = new Linter(enabledRules, options);
+Linter.lintFiles = function lintFiles(filenames, options = {}) {
+  const linter = new Linter(enabledRules(options), options);
   return linter.lintFiles(filenames);
+};
+
+/**
+ * Convenience method that lints the contents of the given string, Stream,
+ * or Buffer
+ *
+ * @function lintData
+ * @memberof Linter
+ * @static
+ * @param {string|external:stream.Readable|external:buffer.buffer} data
+ * @param {LintStreamContext} [context={}]
+ * @param {Linter.LinterOptions} [options={}]
+ * @param {string[]} [options.rules=[]] - Names of rules to enabled
+ * @return {Promise<Linter.LintStreamResult|Error>}
+ */
+Linter.lintData = function lintData(data, context = {}, options = {}) {
+  const linter = new Linter(enabledRules(options), options);
+  let stream;
+
+  if (data instanceof Stream) {
+    stream = data;
+  }
+
+  if (data instanceof Buffer || isString(data)) {
+    stream = new PassThrough();
+    stream.end(data);
+  }
+
+  return linter.lintStream(stream, context);
 };
 
 module.exports = Linter;

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const CLI = require('../lib/CLI');
+const CLI = require('../CLI');
 
 function handleError(err) {
   console.log('Oops! Something went wrong.\n', err);

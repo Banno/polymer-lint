@@ -212,6 +212,8 @@ or the [Node.js API](#nodejs-api).
 Development
 -----------
 
+**Note:** At present, development requires Node.js v6.0.0 or greater.
+
 ### Install
 
 ```sh

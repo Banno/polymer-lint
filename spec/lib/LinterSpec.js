@@ -12,7 +12,7 @@ describe('Linter', () => {
     </dom-module>
   `;
 
-  const context = { filename: 'foo-file' };
+  const context = { filename: 'foo-component.html' };
 
   beforeEach(() => {
     errors = [
@@ -176,11 +176,48 @@ describe('Linter', () => {
 
   describe('static method lintFiles', () => {
     it('calls lintFiles on an instance of Linter', () => {
-      const filenames = ['foo.html'];
+      const filenames = ['foo-component.html'];
       const lintFiles = spyOn(Linter.prototype, 'lintFiles');
 
       Linter.lintFiles(filenames, {});
       expect(lintFiles).toHaveBeenCalledWith(filenames);
     });
+  });
+
+  describe('static method lintData', () => {
+    let lintStream;
+
+    beforeEach(() => {
+      lintStream = spyOn(Linter.prototype, 'lintStream');
+    });
+
+    describe('given a string', () => {
+      it('converts the string to a stream and gives it to the lintStream ' +
+         'method of a Linter instance', () => {
+        Linter.lintData(component, context, {});
+        const [ stream, actualContext ] = lintStream.calls.argsFor(0);
+        expect(stream.read().toString()).toEqual(component);
+        expect(actualContext).toEqual(context);
+      });
+    });
+
+    const testCases = [
+      [ 'string', component ],
+      [ 'Buffer', new Buffer(component) ],
+      [ 'Stream', helpers.streamFromString(component) ],
+    ];
+
+    for (const [ type, data ] of testCases) {
+      /* eslint-disable no-loop-func */
+      describe(`given a ${type}`, () => {
+        it(`converts the ${type} to a stream if necessary and gives it to ` +
+           'the lintStream method of a Linter instance', () => {
+          Linter.lintData(data, context, {});
+          const [ stream, actualContext ] = lintStream.calls.argsFor(0);
+          expect(stream.read().toString()).toEqual(component);
+          expect(actualContext).toEqual(context);
+        });
+      });
+    }
   });
 });

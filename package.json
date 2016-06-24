@@ -21,7 +21,7 @@
     "url": "https://github.com/Banno/polymer-lint/issues"
   },
   "bin": {
-    "polymer-lint": "./bin/polymer-lint.js"
+    "polymer-lint": "./lib/bin/polymer-lint.js"
   },
   "main": "./lib/Linter.js",
   "scripts": {
