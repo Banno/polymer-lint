@@ -1,10 +1,10 @@
-const CLI = require('../../lib/CLI');
+const CLI = require('CLI');
 
 describe('CLI', () => {
   let Options;
 
   beforeEach(() => {
-    Options = require('../../lib/Options');
+    Options = require('Options');
     spyOn(console, 'log');
   });
 

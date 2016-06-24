@@ -1,7 +1,7 @@
 const EventEmitter = require('events').EventEmitter;
 
 const componentNameMatchesFilename =
-  require('../../../lib/rules/component-name-matches-filename');
+  require('rules/component-name-matches-filename');
 
 describe('component-name-doesnt-match-filename', () => {
   let mockParser, onError;

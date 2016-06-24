@@ -1,4 +1,4 @@
-const componentNameFromPath = require('../../../lib/util/componentNameFromPath');
+const componentNameFromPath = require('util/componentNameFromPath');
 
 describe('componentNameFromPath', () => {
   describe('when the path includes a valid component name', () => {

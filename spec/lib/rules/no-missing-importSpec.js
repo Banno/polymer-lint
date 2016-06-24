@@ -1,6 +1,6 @@
 const EventEmitter = require('events').EventEmitter;
 
-const noMissingImport = require('../../../lib/rules/no-missing-import');
+const noMissingImport = require('rules/no-missing-import');
 
 describe('no-missing-import', () => {
   let mockParser, onError;

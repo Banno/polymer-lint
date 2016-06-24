@@ -1,5 +1,5 @@
 const { EventEmitter } = require('events');
-const oneComponent = require('../../../lib/rules/one-component');
+const oneComponent = require('rules/one-component');
 
 describe('one-component', () => {
   let mockParser, onError;

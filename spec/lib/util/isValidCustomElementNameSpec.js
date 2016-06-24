@@ -1,4 +1,4 @@
-const isValidCustomElementName = require('../../../lib/util/isValidCustomElementName');
+const isValidCustomElementName = require('util/isValidCustomElementName');
 
 describe('isValidCustomElementName', () => {
   describe('returns true for valid name', () => {

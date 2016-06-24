@@ -195,22 +195,50 @@ At present configuration is only possible via [command-line arguments](#command-
 Development
 -----------
 
+### Install
+
 ```sh
 $ git clone git@github.com:Banno/polymer-lint.git
 $ cd polymer-lint
 $ npm install
 ```
 
+### Build
+
+To transpile the code:
+
+```sh
+$ npm run build
+```
+
+Transpiled code will be written to `./lib`.
+
 ### Run with examples
 
 ```sh
-$ node bin/polymer-lint.js example
+$ ./polymer-lint.js example
 ```
 
 ### Jasmine specs
 
+To run all of the specs:
+
 ```sh
 $ npm test
+```
+
+To run a specific spec file:
+
+```sh
+$ npm test spec/lib/mySpec.js
+```
+
+By default the specs will run tests against the pre-transpiler code in `./src`.
+To run the tests against the transpiled code (i.e. after `npm run build`), set
+the `NODE_PATH` environment variable:
+
+```sh
+$ NODE_PATH=./lib npm test
 ```
 
 ### ESLint

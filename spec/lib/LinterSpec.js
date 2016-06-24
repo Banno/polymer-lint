@@ -20,7 +20,7 @@ describe('Linter', () => {
       { message: 'Dummy message 2', location: { line: 2, col: 2 } },
     ];
 
-    Linter = require('../../lib/Linter');
+    Linter = require('Linter');
     dummyFileStream = helpers.streamFromString(component);
     spyOn(fs, 'createReadStream').and.returnValue(dummyFileStream);
 

@@ -1,4 +1,4 @@
-const SAXParser = require('../../lib/SAXParser');
+const SAXParser = require('SAXParser');
 
 describe('SAXParser', () => {
   function attributesContaining(attrsObj) {

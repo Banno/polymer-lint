@@ -1,5 +1,5 @@
-const rules = require('../../lib/rules');
-const SAXParser = require('../../lib/SAXParser');
+const rules = require('rules');
+const SAXParser = require('SAXParser');
 
 describe('rules', () => {
   it('exports an object', () => {

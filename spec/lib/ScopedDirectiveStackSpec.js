@@ -1,5 +1,5 @@
 const EventEmitter = require('events').EventEmitter;
-const ScopedDirectiveStack = require('../../lib/ScopedDirectiveStack');
+const ScopedDirectiveStack = require('ScopedDirectiveStack');
 
 describe('ScopedDirectiveStack', () => {
   let mockParser, stack;

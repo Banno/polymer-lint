@@ -1,4 +1,4 @@
-const resolvePatterns = require('../../../lib/util/resolvePatterns');
+const resolvePatterns = require('util/resolvePatterns');
 
 describe('resolvePatterns', () => {
   let fs, glob;

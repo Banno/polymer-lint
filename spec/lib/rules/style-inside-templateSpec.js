@@ -1,5 +1,5 @@
 const { EventEmitter } = require('events');
-const styleInsideTemplate = require('../../../lib/rules/style-inside-template');
+const styleInsideTemplate = require('rules/style-inside-template');
 
 describe('style-inside-template', () => {
   const location = { line: 2, col: 3 };

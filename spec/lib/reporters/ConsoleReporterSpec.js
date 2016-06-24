@@ -1,4 +1,4 @@
-const ConsoleReporter = require('../../../lib/reporters/ConsoleReporter');
+const ConsoleReporter = require('reporters/ConsoleReporter');
 
 describe('ConsoleReporter', () => {
   let mockOut;

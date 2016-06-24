@@ -1,5 +1,5 @@
 const { EventEmitter } = require('events');
-const noUnusedImport = require('../../../lib/rules/no-unused-import');
+const noUnusedImport = require('rules/no-unused-import');
 
 describe('no-unused-import', () => {
   let mockParser, onError;
