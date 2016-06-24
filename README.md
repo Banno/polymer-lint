@@ -207,7 +207,7 @@ $ open doc/index.html
 Configuration
 -------------
 At present configuration is only possible via [command-line arguments](#command-line)
-(see [Usage](#usage)) or the [Node.js API](#api-documentation).
+or the [Node.js API](#nodejs-api).
 
 Development
 -----------
