@@ -1,6 +1,6 @@
 {
   "name": "polymer-lint",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Polymer Linter",
   "author": "Jordan Running <jordan.running@banno.com>",
   "license": "Apache-2.0",
@@ -19,9 +19,6 @@
   "homepage": "https://github.com/Banno/polymer-lint",
   "bugs": {
     "url": "https://github.com/Banno/polymer-lint/issues"
-  },
-  "engines": {
-    "node": ">=6.0.0"
   },
   "bin": {
     "polymer-lint": "./bin/polymer-lint.js"

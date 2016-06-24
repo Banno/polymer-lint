@@ -22,7 +22,6 @@ Table of Contents
 
 Installation
 ------------
-**Note:** At present polymer-lint requires Node.js 6.0.0 or greater.
 
 ```sh
 $ npm install -g 'git+ssh://git@github.com:Banno/polymer-lint.git'
