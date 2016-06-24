@@ -11,6 +11,7 @@ Table of Contents
     - [Rules](#rules)
       - [component-name-matches-filename](#component-name-matches-filename)
       - [no-missing-import](#no-missing-import)
+      - [no-unused-import](#no-unused-import)
       - [one-component](#one-component)
       - [style-inside-template](#style-inside-template)
     - [Linter directives](#linter-directives)
@@ -59,7 +60,7 @@ Ensures that the component defined in a file matches its filename.
 
 ```html
 <!-- file: foo-component.html -->
-<dom-module id="bar-component">...</dom-module>
+<dom-module id="other-component">...</dom-module>
 ```
 
 #### no-missing-import
@@ -81,12 +82,29 @@ define `foo-component`.
 </dom-module>
 ```
 
-###### Error
+#### no-unused-import
+
+Ensures that all components that are imported are used.
+
+###### OK
 
 ```html
+<link rel="import" href="foo-component.html"/>
 <dom-module id="my-component">
   <template>
     <foo-component/>
+  </template>
+</dom-module>
+```
+
+
+###### Error
+
+```html
+<link rel="import" href="foo-component.html"/>
+<dom-module id="my-component">
+  <template>
+    <other-component/>
   </template>
 </dom-module>
 ```
