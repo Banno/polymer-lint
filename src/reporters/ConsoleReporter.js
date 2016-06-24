@@ -29,7 +29,7 @@ function filterErrors(errors, stack) {
  * lineMetrics(errors);
  * // => { message: 30, line: 3, col: 2 }
  *
- * @param {Object[]} errors
+ * @param {Linter.LinterError[]} errors
  * @return {{line: number, col: number, message: number}}
  */
 function lineMetrics(errors) {
@@ -100,7 +100,7 @@ class ConsoleReporter {
   }
 
   /**
-   * @param {LintFileResult[]} results
+   * @param {Linter.LintFileResult[]} results
    * @return {number} - The number of errors reported
    */
   report(results) {
@@ -114,8 +114,8 @@ class ConsoleReporter {
   }
 
   /**
-   * @param {LintFileResult} errors
-   * @param {LintFileContext} context
+   * @param {Linter.LintError[]} errors
+   * @param {Linter.LintFileContext} context
    * @return {number} - The number of errors reported
    */
   reportFile(errors, context) {

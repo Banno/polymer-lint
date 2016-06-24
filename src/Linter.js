@@ -31,16 +31,25 @@ const ScopedDirectiveStack = require('./ScopedDirectiveStack');
  */
 
 /**
+ * @typedef LintError
+ * @type {Object}
+ * @property {string} message - The error description
+ * @property {string} rule - The rule name
+ * @property {SAXParser.LocationInfo} location
+ *   The source location of the error
+ */
+
+/**
  * @typedef LintStreamResult
  * @type {Object}
- * @property {LintError[]} errors
+ * @property {Linter.LintError[]} errors
  * @property {Linter.LintStreamContext} context
  * @memberof Linter
  */
 
 /**
  * @typedef LintFileResult
- * @extends {LintStreamResult}
+ * @extends {Linter.LintStreamResult}
  * @type {Object}
  * @property {Linter.LintFileContext} context
  * @memberof Linter
@@ -99,7 +108,7 @@ class Linter {
   /**
    * Lint the contents of the given readable stream
    * @param {external:stream.Readable} stream
-   * @param {LintStreamContext} context
+   * @param {Linter.LintStreamContext} context
    * @return {Promise<Linter.LintStreamResult|Error>}
    */
   lintStream(stream, context) {
@@ -162,7 +171,7 @@ Linter.lintFiles = function lintFiles(filenames, options = {}) {
  * @memberof Linter
  * @static
  * @param {string|external:stream.Readable|external:buffer.buffer} data
- * @param {LintStreamContext} [context={}]
+ * @param {Linter.LintStreamContext} [context={}]
  * @param {Linter.LinterOptions} [options={}]
  * @param {string[]} [options.rules=[]] - Names of rules to enabled
  * @return {Promise<Linter.LintStreamResult|Error>}
