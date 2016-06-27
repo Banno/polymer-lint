@@ -60,7 +60,7 @@ function formatLine({ rule, message, location }, metrics) {
   const { line: lineW, col: colW, message: msgW } = metrics;
   const loc = sprintf(`%${lineW}d:%-${colW}d`, line, col);
   const msg = sprintf(`%-${msgW}s`, message);
-  return `  ${loc} ${msg} ${rule}`;
+  return `  ${loc}  ${msg}  ${rule}`;
 }
 
 // Private methods
@@ -68,7 +68,6 @@ const write = Symbol('write');
 const writeFilename = Symbol('writeFilename');
 const writeErrors = Symbol('writeErrors');
 const writeError = Symbol('writeError');
-const writeSummary = Symbol('writeSummary');
 
 // Private properties
 const chalk = Symbol('chalk');
@@ -80,7 +79,7 @@ class ConsoleReporter {
    * @param {?Object} options
    */
   constructor(outOrOptions = {}, options) {
-    let opts, colorEnabled;
+    let opts;
 
     if (outOrOptions.write && typeof outOrOptions.write === 'function') {
       this.out = outOrOptions;
@@ -90,16 +89,11 @@ class ConsoleReporter {
       opts = outOrOptions || {};
     }
 
-    if (opts.color === false) {
-      colorEnabled = false;
-    } else {
-      colorEnabled = Boolean(opts.color === true || this.out.isTTY);
-    }
-
-    this[chalk] = new _chalk.constructor({ enabled: colorEnabled });
+    this[chalk] = new _chalk.constructor({ enabled: opts.color });
   }
 
   /**
+   * Output a report for the given `results`
    * @param {Linter.LintFileResult[]} results
    * @return {number} - The number of errors reported
    */
@@ -108,12 +102,15 @@ class ConsoleReporter {
       (num, { errors, context }) => num + this.reportFile(errors, context)
     , 0);
 
-    this[writeSummary](numErrors);
+    if (numErrors > 0) {
+      this.reportSummary(numErrors);
+    }
 
     return numErrors;
   }
 
   /**
+   * Output a report for the given errors
    * @param {Linter.LintError[]} errors
    * @param {Linter.LintFileContext} context
    * @return {number} - The number of errors reported
@@ -131,6 +128,19 @@ class ConsoleReporter {
     return errorsFiltered.length;
   }
 
+  /**
+   * Report the total number of errors
+   * @param {number} num - The number of errors reported
+   * @return {number} - The number of errors reported (same as `num` argument)
+   */
+  reportSummary(num) {
+    if (num === 0) {
+      return;
+    }
+    this[write](this[chalk].bold.red(`\u2716 ${num} error${num === 1 ? '' : 's'}`));
+    return num;
+  }
+
   [writeFilename](filename) {
     const relativePath = path.relative(process.cwd(), filename);
     this[write](this[chalk].underline(relativePath));
@@ -146,13 +156,6 @@ class ConsoleReporter {
 
   [writeError](error, metrics) {
     this[write](formatLine(error, metrics));
-  }
-
-  [writeSummary](num) {
-    if (num === 0) {
-      return;
-    }
-    this[write](this[chalk].bold.red(`\u2716 ${num} error${num === 1 ? '' : 's'}`));
   }
 
   [write](...args) {

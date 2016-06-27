@@ -194,6 +194,10 @@ my-component.html
 ✖ 2 errors
 ```
 
+### Gulp task
+
+See [gulp-task/README.md](src/gulp-task/README.md).
+
 ### Node.js API
 
 API documentation can be generated with [JSDoc](http://usejsdoc.org/):
@@ -280,6 +284,6 @@ TODO
 ----
   * Windows support
   * Read configuration from file
-  * Gulp, Grunt tasks
+  * Grunt task
   * Put API docs online
   * Editor integrations
