@@ -17,17 +17,22 @@ function lint(file, options = {}) {
 
 const log = _log.bind(null, `[${PLUGIN_NAME}]`);
 
-function _reporter() {
-  return new ConsoleReporter({
+function _reporter(options) {
+  const out = options.out || {
     write(str) {
       // unindent, strip trailing newline(s)
       const stripped = str.replace(/\n*$/, '');
       return stripped && log(stripped);
     }
-  });
+  };
+  delete options.out;
+
+  return new ConsoleReporter(out, options);
 }
 
 /**
+ * Returns a Transform stream that lints the Files it receives.
+ *
  * @function polymerLint
  * @param {Object} [options={}]
  * @param {string[]} [options.rules=]
@@ -45,9 +50,7 @@ function _reporter() {
  * });
  */
 module.exports = function polymerLint(options = {}) {
-  let totalErrors = 0;
   const transformStream = new Transform({ objectMode: true });
-  const reporter = _reporter();
 
   transformStream._transform = function _transform(file, encoding, callback) {
     if (file.isNull()) {
@@ -55,9 +58,9 @@ module.exports = function polymerLint(options = {}) {
       return;
     }
 
-    lint(file, options).then(({ errors, context }) => {
+    lint(file, options).then(result => {
       try {
-        totalErrors += reporter.reportFile(errors, context);
+        file.polymerLint = result;
         callback(null, file);
       } catch (err) {
         this.emit('error', new PluginError(PLUGIN_NAME, err));
@@ -65,6 +68,55 @@ module.exports = function polymerLint(options = {}) {
     })
     .catch(err => this.emit('error', err));
 
+    return;
+  };
+
+  return transformStream;
+};
+
+/**
+ * Returns a Transform stream that reports the linter results for the
+ * Files it receives.
+ *
+ * @function polymerLint.report
+ * @param {Object} [options={}] - Options to pass to ConsoleReporter
+ * @param {stream.Writable|fs.WriteStream|Object} [options.out=]
+ *   A stream to write output to (defaults to stdout); will be passed as the
+ *   first argument to ConsoleReporter's constructor.
+ * @return {external:stream.Transform}
+ *
+ * @example
+ * const gulp = require('gulp');
+ * const polymerLint = require('polymer-lint/gulp');
+ *
+ * gulp.task('default', () => {
+ *   return gulp.src('./src/components/*.html')
+ *     .pipe(polymerLint({ rules: ['no-missing-import', 'no-unused-import'] }))
+ *     .pipe(polymerLint.report())
+ *     .pipe(gulp.dest('./dist/'));
+ * });
+ */
+module.exports.report = function report(options = {}) {
+  let totalErrors = 0;
+  const reporter = _reporter(options);
+  const transformStream = new Transform({ objectMode: true });
+
+  transformStream._transform = function _transform(file, encoding, callback) {
+    if (file.isNull()) {
+      callback(null, file);
+      return;
+    }
+
+    try {
+      if (file.polymerLint) {
+        const { errors, context } = file.polymerLint;
+        totalErrors += reporter.reportFile(errors, context);
+      }
+    } catch (err) {
+      this.emit('error', new PluginError(PLUGIN_NAME, err));
+    }
+
+    callback(null, file);
     return;
   };
 

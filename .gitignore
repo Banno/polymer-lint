@@ -37,8 +37,8 @@ jspm_packages
 .node_repl_history
 
 # Build artifacts
-lib
-doc
+/lib
+/doc
 
 # Miscellaneous
 .agignore
