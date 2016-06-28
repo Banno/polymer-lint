@@ -21,7 +21,22 @@
  * >             | [#x10000-#xEFFFF]
  * >
  * >     This uses the EBNF notation from the XML specification.
- * >
+ */
+const PCEN_CHAR = '(?:' +
+  '[' +
+    '-.0-9_a-z\xb7' +
+    '\xc0-\xd6\xd8-\xf6\xf8-\u037d' +
+    '\u037f-\u1fff\u200c\u200d\u203f\u2040' +
+    '\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff' +
+    '\uf900-\ufdcf\ufdf0-\ufffd' +
+  ']|' +
+  '[\ud800-\udb7f][\udc00-\udfff]' +
+')';
+
+const POTENTIAL_CUSTOM_ELEMENT_NAME =
+  new RegExp(`^[a-z]${PCEN_CHAR}*-${PCEN_CHAR}*$`);
+
+/*
  * >   * `name` must not be any of the following:
  * >
  * >       * annotation-xml
@@ -33,34 +48,6 @@
  * >       * font-face-name
  * >       * missing-glyph
  */
-
-// Arrays below represent code point ranges
-const PCEN_CHAR_CLASSES = [
-  /* eslint-disable array-bracket-spacing */
-  '-.0-9_a-z', '\u{b7}',
-  [0xc0, 0xd6], [0xd8, 0xf6], [0xf8, 0x37d],
-  [0x37f, 0x1fff], [0x200c, 0x200d], [0x203f, 0x2040],
-  [0x2070, 0x218f], [0x2c00, 0x2fef], [0x3001, 0xd7ff],
-  [0xf900, 0xfdcf], [0xfdf0, 0xfffd], [0x10000, 0xeffff],
-];
-
-const HYPHEN = '-'.codePointAt(0);
-
-const PCEN_CHAR = `[${
-  // Convert range arrays into RegExp range expressions,
-  // e.g. [0x61, 0x66] -> "a-f".
-  PCEN_CHAR_CLASSES.map(cls => {
-    if (Array.isArray(cls)) {
-      return String.fromCodePoint(cls[0], HYPHEN, cls[1]);
-    }
-
-    return cls;
-  }).join('')
-}]`;
-
-const POTENTIAL_CUSTOM_ELEMENT_NAME =
-  new RegExp(`^[a-z]${PCEN_CHAR}*-${PCEN_CHAR}*$`, 'u');
-
 const DISALLOWED_NAMES = [
   'annotation-xml', 'color-profile', 'dom-module',
   'font-face', 'font-face-src', 'font-face-uri',

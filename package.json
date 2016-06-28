@@ -27,7 +27,7 @@
   "scripts": {
     "lint": "eslint src spec; exit 0",
     "test": "NODE_PATH=${NODE_PATH:-\"$PWD/src\"} jasmine",
-    "build": "babel src -d lib",
+    "build": "babel --presets modern-node/4.0 --source-maps false src -d lib",
     "prepublish": "npm run build"
   },
   "files": [
@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
+    "babel-preset-modern-node": "^2.2.1",
     "eslint": "^2.13.1",
     "eslint-config-google": "^0.6.0",
     "eslint-plugin-jasmine": "^1.8.1",
