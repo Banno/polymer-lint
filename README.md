@@ -15,6 +15,7 @@ Table of Contents
       - [one-component](#one-component)
       - [style-inside-template](#style-inside-template)
     - [Linter directives](#linter-directives)
+    - [Gulp task](#gulp-task)
     - [Node.js API](#nodejs-api)
   - [Configuration](#configuration)
   - [Development](#development)
@@ -196,7 +197,7 @@ my-component.html
 
 ### Gulp task
 
-See [gulp-task/README.md](src/gulp-task/README.md).
+See [gulp-task/README.md](src/gulp-task).
 
 ### Node.js API
 
