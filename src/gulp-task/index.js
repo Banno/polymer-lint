@@ -1,7 +1,7 @@
 /** @module gulp-polymer-lint */
 
 const { Transform } = require('stream');
-const { PluginError, log: _log } = require('gulp-util');
+const { PluginError, log } = require('gulp-util');
 const ConsoleReporter = require('../reporters/ConsoleReporter');
 const { lintData } = require('../Linter');
 
@@ -15,19 +15,31 @@ function lint(file, options = {}) {
   });
 }
 
-const log = _log.bind(null, `[${PLUGIN_NAME}]`);
-
 function _reporter(options) {
   const out = options.out || {
+    // Trim trailing newlines
     write(str) {
-      // unindent, strip trailing newline(s)
-      const stripped = str.replace(/\n*$/, '');
-      return stripped && log(stripped);
-    }
+      log(str.replace(/\n+$/, ''));
+    },
   };
   delete options.out;
-
   return new ConsoleReporter(out, options);
+}
+
+/**
+ * Convenience function for creating a Transform stream
+ *
+ * @param {Function} transform - A function to be called for each File received
+ * @param {Function} [flush] - A function to be called when the stream ends
+ * @returns {external:stream.Transform}
+ */
+function transform(transform, flush) {
+  const stream = new Transform({ objectMode: true });
+  stream._transform = transform;
+  if (typeof flush === 'function') {
+    stream._flush = flush;
+  }
+  return stream;
 }
 
 /**
@@ -35,7 +47,7 @@ function _reporter(options) {
  *
  * @function polymerLint
  * @param {Object} [options={}]
- * @param {string[]} [options.rules=]
+ * @param {string[]} [options.rules]
  *   An array of rule names to enable (default is all rules)
  * @return {external:stream.Transform}
  *
@@ -50,9 +62,7 @@ function _reporter(options) {
  * });
  */
 module.exports = function polymerLint(options = {}) {
-  const transformStream = new Transform({ objectMode: true });
-
-  transformStream._transform = function _transform(file, encoding, callback) {
+  return transform(function(file, enc, callback) {
     if (file.isNull()) {
       callback(null, file);
       return;
@@ -69,9 +79,7 @@ module.exports = function polymerLint(options = {}) {
     .catch(err => this.emit('error', err));
 
     return;
-  };
-
-  return transformStream;
+  });
 };
 
 /**
@@ -80,7 +88,7 @@ module.exports = function polymerLint(options = {}) {
  *
  * @function polymerLint.report
  * @param {Object} [options={}] - Options to pass to ConsoleReporter
- * @param {stream.Writable|fs.WriteStream|Object} [options.out=]
+ * @param {stream.Writable|fs.WriteStream|Object} [options.out]
  *   A stream to write output to (defaults to stdout); will be passed as the
  *   first argument to ConsoleReporter's constructor.
  * @return {external:stream.Transform}
@@ -99,9 +107,8 @@ module.exports = function polymerLint(options = {}) {
 module.exports.report = function report(options = {}) {
   let totalErrors = 0;
   const reporter = _reporter(options);
-  const transformStream = new Transform({ objectMode: true });
 
-  transformStream._transform = function _transform(file, encoding, callback) {
+  return transform(function(file, enc, callback) {
     if (file.isNull()) {
       callback(null, file);
       return;
@@ -118,15 +125,57 @@ module.exports.report = function report(options = {}) {
 
     callback(null, file);
     return;
-  };
-
-  transformStream.on('end', function() {
+  }, function() {
     try {
       reporter.reportSummary(totalErrors);
     } catch (err) {
       this.emit('error', new PluginError(PLUGIN_NAME, err));
     }
   });
+};
 
-  return transformStream;
+/**
+ * Returns a Transform stream that waits for the stream to end before reporting
+ * the linter results for all Files it has received.
+ *
+ * @function polymerLint.reportAtEnd
+ * @param {Object} [options={}] - Options to pass to ConsoleReporter
+ * @param {stream.Writable|fs.WriteStream|Object} [options.out]
+ *   A stream to write output to (defaults to stdout); will be passed as the
+ *   first argument to ConsoleReporter's constructor.
+ * @return {external:stream.Transform}
+ *
+ * @example
+ * const gulp = require('gulp');
+ * const polymerLint = require('polymer-lint/gulp');
+ *
+ * gulp.task('default', () => {
+ *   return gulp.src('./src/components/*.html')
+ *     .pipe(polymerLint({ rules: ['no-missing-import', 'no-unused-import'] }))
+ *     .pipe(polymerLint.reportAtEnd())
+ *     .pipe(gulp.dest('./dist/'));
+ * });
+ */
+module.exports.reportAtEnd = function reportAtEnd(options = {}) {
+  const results = [];
+
+  return transform((file, enc, callback) => {
+    if (file.isNull()) {
+      callback(null, file);
+      return;
+    }
+
+    if (file.polymerLint) {
+      results.push(file.polymerLint);
+    }
+
+    callback(null, file);
+  }, function(file, enc, callback) {
+    try {
+      const reporter = _reporter(options);
+      reporter.report(results);
+    } catch (err) {
+      this.emit('error', new PluginError(PLUGIN_NAME, err));
+    }
+  });
 };

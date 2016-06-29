@@ -80,20 +80,65 @@ describe('gulp-polymer-lint', () => {
     });
 
     it('outputs the errors using ConsoleReporter', done => {
+      const expected = [
+        `^${filename}\n$`,
+        /no-missing-import\n$/,
+        /no-unused-import\n$/,
+      ];
+
       stream.on('finish', () => {
-        const expected = [ `${filename}\n`,
-          jasmine.stringMatching(/no-missing-import\n$/),
-          jasmine.stringMatching(/no-unused-import\n$/),
-        ];
-
         for (const line of expected) {
-          expect(write).toHaveBeenCalledWith(line);
+          expect(write).toHaveBeenCalledWith(jasmine.stringMatching(line));
         }
-
         done();
       });
 
       stream.write(file);
+      stream.end();
+    });
+  });
+
+  describe('reportAtEnd', () => {
+    let write, options, file2;
+
+    const filename2 = 'baz-component.html';
+
+    const component2 = new Buffer(`
+      <dom-module id="baz-component">
+        <template><qux-component/></template>
+      </dom-module>
+    `);
+
+    beforeEach(() => {
+      file2 = new File({ path: filename2, contents: component2 });
+      write = jasmine.createSpy('write');
+      options = { out: { write }, color: false };
+      stream.pipe(
+        polymerLint.reportAtEnd(options).on('error', fail)
+      );
+    });
+
+    it('outputs all of the errors at the end', done => {
+      const expected = [
+        `^${filename}\n$`,
+        /no-missing-import\n$/,
+        /no-unused-import\n$/,
+        '\n',
+        `^${filename2}\n$`,
+        /no-missing-import\n/,
+        '\n',
+        '^✖ 3 errors\n$',
+      ];
+
+      stream.on('end', () => {
+        for (const line of expected) {
+          expect(write).toHaveBeenCalledWith(jasmine.stringMatching(line));
+        }
+        done();
+      });
+
+      stream.write(file);
+      stream.write(file2);
       stream.end();
     });
   });
