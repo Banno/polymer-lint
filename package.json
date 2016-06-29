@@ -32,7 +32,8 @@
   },
   "files": [
     "lib",
-    "bin"
+    "bin",
+    "gulp.js"
   ],
   "dependencies": {
     "chalk": "^1.1.3",
