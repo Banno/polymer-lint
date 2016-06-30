@@ -17,7 +17,8 @@ describe('component-name-doesnt-match-filename', () => {
       const filename = `/foo/bar/${componentName}.html`;
 
       componentNameMatchesFilename({ filename }, mockParser, onError);
-      mockParser.emit('domModuleStartTag', componentName, { id: componentName }, false, {});
+      mockParser.emit('domModuleStartTag', componentName,
+        [ { name: 'id', value: componentName } ], false, {});
 
       expect(onError).not.toHaveBeenCalledTimes(1);
     });
@@ -31,7 +32,8 @@ describe('component-name-doesnt-match-filename', () => {
       const location = { line: 10, col: 20 };
 
       componentNameMatchesFilename({ filename }, mockParser, onError);
-      mockParser.emit('domModuleStartTag', componentName, { id: componentName }, false, location);
+      mockParser.emit('domModuleStartTag', componentName,
+        [ { name: 'id', value: componentName } ], false, location);
 
       expect(onError).toHaveBeenCalledTimes(1);
       expect(onError).toHaveBeenCalledWith({

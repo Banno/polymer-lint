@@ -1,5 +1,7 @@
 // Rule: no-unused-import
 const componentNameFromPath = require('../util/componentNameFromPath');
+const getAttribute = require('../util/getAttribute');
+const isValidCustomElementName = require('../util/isValidCustomElementName');
 
 /**
  * Checks if all imported components are used.
@@ -23,6 +25,22 @@ module.exports = function noUnusedImport(context, parser, onError) {
        * @todo Is this the correct behavior?
        */
       imports.push([ name, location ]);
+    }
+  });
+
+  parser.on('startTag', (name, attrs) => {
+    let componentName;
+
+    if (name === 'style') {
+      // <style include="..."/>
+      componentName = getAttribute(attrs, 'include');
+    } else if (!isValidCustomElementName(name)) {
+      // Extended built-in element, e.g. <button is="...">
+      componentName = getAttribute(attrs, 'is');
+    }
+
+    if (componentName) {
+      usedImports[componentName] = true;
     }
   });
 

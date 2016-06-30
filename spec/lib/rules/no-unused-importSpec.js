@@ -15,7 +15,35 @@ describe('no-unused-import', () => {
 
   describe('when all imported components are used', () => {
     beforeEach(() => {
-      mockParser.emit('customElementStartTag', componentName, {}, false, {});
+      mockParser.emit('customElementStartTag', componentName, [], false, {});
+      mockParser.emit('end');
+    });
+
+    it('does not call the onError callback', () => {
+      expect(onError).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('when an imported component is used in a <style> tag\'s ' +
+           '`include` attribute', () => {
+    beforeEach(() => {
+      // <style include="...">
+      mockParser.emit('startTag', 'style',
+        [ { name: 'include', value: componentName } ], false, {});
+      mockParser.emit('end');
+    });
+
+    it('does not call the onError callback', () => {
+      expect(onError).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('when an imported component is used in a built-in element\'s ' +
+           '`is` attribute', () => {
+    beforeEach(() => {
+      // <button is="...">
+      mockParser.emit('startTag', 'button',
+        [ { name: 'is', value: componentName } ], false, {});
       mockParser.emit('end');
     });
 

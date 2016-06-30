@@ -13,7 +13,7 @@ describe('one-component', () => {
 
   describe('when one component is defined', () => {
     beforeEach(() => {
-      mockParser.emit('domModuleStartTag', 'foo', {}, false, {});
+      mockParser.emit('domModuleStartTag', 'foo', [], false, {});
     });
 
     it('does not call the onError callback', () => {
@@ -24,7 +24,7 @@ describe('one-component', () => {
       const location = { line: 6, col: 13 };
 
       beforeEach(() => {
-        mockParser.emit('domModuleStartTag', 'bar', {}, false, location);
+        mockParser.emit('domModuleStartTag', 'bar', [], false, location);
       });
 
       it('calls the onError callback with the expected arguments', () => {
