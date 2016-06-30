@@ -1,13 +1,13 @@
 const EventEmitter = require('events').EventEmitter;
-const ScopedDirectiveStack = require('ScopedDirectiveStack');
+const DirectiveStack = require('DirectiveStack');
 
-describe('ScopedDirectiveStack', () => {
+describe('DirectiveStack', () => {
   let mockParser, stack;
 
   beforeEach(() => {
     mockParser = new EventEmitter();
     spyOn(mockParser, 'on').and.callThrough();
-    stack = new ScopedDirectiveStack();
+    stack = new DirectiveStack();
     stack.listenTo(mockParser);
   });
 

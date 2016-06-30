@@ -145,7 +145,7 @@ describe('Linter', () => {
           promise.then(({ errors, context: actualContext }) => {
             expect(errors).toEqual(errsWithNames);
             expect(actualContext.filename).toEqual(context.filename);
-            expect(actualContext.stack.constructor.name).toEqual('ScopedDirectiveStack');
+            expect(actualContext.stack.constructor.name).toEqual('DirectiveStack');
             done();
           });
         });
