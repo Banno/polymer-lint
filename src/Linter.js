@@ -6,7 +6,7 @@ const { isString } = require('util');
 
 const { enabledRules } = require('./util');
 const SAXParser = require('./SAXParser');
-const ScopedDirectiveStack = require('./ScopedDirectiveStack');
+const DirectiveStack = require('./DirectiveStack');
 
 /**
  * @typedef LinterOptions
@@ -18,7 +18,7 @@ const ScopedDirectiveStack = require('./ScopedDirectiveStack');
  * @typedef LintStreamContext
  * @type {Object}
  * @property {string} filename=
- * @property {ScopedDirectiveStack} stack
+ * @property {DirectiveStack} stack
  * @memberof Linter
  */
 
@@ -115,7 +115,7 @@ class Linter {
     const parser = new SAXParser({ locationInfo: true });
     const errors = [];
 
-    const stack = new ScopedDirectiveStack();
+    const stack = new DirectiveStack();
     stack.listenTo(parser);
 
     const onError = rule =>

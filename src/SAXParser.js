@@ -14,6 +14,7 @@
  */
 const parse5 = require('parse5');
 
+const getAttribute = require('./util/getAttribute');
 const isValidCustomElementName = require('./util/isValidCustomElementName');
 
 /**
@@ -109,11 +110,6 @@ const isValidCustomElementName = require('./util/isValidCustomElementName');
  * @description Emitted when the linter leaves a scope (i.e. an end tag).
  * @param {LocationInfo} location
  */
-
-function getAttribute(attrs, attrName) {
-  const attr = attrs.find(({ name }) => name === attrName);
-  return attr && attr.value;
-}
 
 const SPLIT_DIRECTIVE_ARGS_EXPR = /\s*(?:,\s*)+/;
 

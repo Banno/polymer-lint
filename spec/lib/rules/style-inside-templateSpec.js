@@ -14,19 +14,19 @@ describe('style-inside-template', () => {
 
   describe('when <style> is inside <template>', () => {
     beforeEach(() => {
-      mockParser.emit('startTag', 'template', {}, false, {});
+      mockParser.emit('startTag', 'template', [], false, {});
     });
 
     it('does not call the onError callback', () => {
-      mockParser.emit('startTag', 'style', {}, false, {});
+      mockParser.emit('startTag', 'style', [], false, {});
       expect(onError).not.toHaveBeenCalled();
     });
   });
 
   describe('when <style> is before <template>', () => {
     it('calls the onError callback with the expected arguments', () => {
-      mockParser.emit('startTag', 'style', {}, false, location);
-      mockParser.emit('startTag', 'template', {}, false, {});
+      mockParser.emit('startTag', 'style', [], false, location);
+      mockParser.emit('startTag', 'template', [], false, {});
 
       expect(onError).toHaveBeenCalledWith({
         message: '<style> tag outside of <template>', location,
@@ -36,9 +36,9 @@ describe('style-inside-template', () => {
 
   describe('when <style> is after </template>', () => {
     it('calls the onError callback with the expected arguments', () => {
-      mockParser.emit('startTag', 'template', {}, false, {});
+      mockParser.emit('startTag', 'template', [], false, {});
       mockParser.emit('endTag', 'template');
-      mockParser.emit('startTag', 'style', {}, false, location);
+      mockParser.emit('startTag', 'style', [], false, location);
 
       expect(onError).toHaveBeenCalledWith({
         message: '<style> tag outside of <template>', location,
@@ -49,8 +49,8 @@ describe('style-inside-template', () => {
   describe('when <template> is self-closing', () => {
     it('calls the onError callback with the expected arguments', () => {
       const selfClosing = true;
-      mockParser.emit('startTag', 'template', {}, selfClosing, {});
-      mockParser.emit('startTag', 'style', {}, false, location);
+      mockParser.emit('startTag', 'template', [], selfClosing, {});
+      mockParser.emit('startTag', 'style', [], false, location);
 
       expect(onError).toHaveBeenCalledWith({
         message: '<style> tag outside of <template>', location,
