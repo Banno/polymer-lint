@@ -3,6 +3,14 @@ const componentNameFromPath = require('../util/componentNameFromPath');
 const getAttribute = require('../util/getAttribute');
 const isValidCustomElementName = require('../util/isValidCustomElementName');
 
+const POLYMER_BUILTINS = [
+  'array-selector', 'custom-style', 'dom-bind',
+  'dom-if', 'dom-repeat', 'dom-template'
+].reduce((builtIns, name) => {
+  builtIns[name] = true;
+  return builtIns;
+}, {});
+
 /**
  * Checks if each custom element referenced in a template has a
  * matching import.
@@ -17,10 +25,11 @@ const isValidCustomElementName = require('../util/isValidCustomElementName');
 module.exports = function noMissingImport(context, parser, onError) {
   const imports = {};
 
-  const check = (name, location) => imports[name] || onError({
-    message: `Custom element '${name}' used but not imported`,
-    location,
-  });
+  const check = (name, location) =>
+    POLYMER_BUILTINS[name] || imports[name] || onError({
+      message: `Custom element '${name}' used but not imported`,
+      location,
+    });
 
   parser.on('importTag', href => {
     const name = componentNameFromPath(href);

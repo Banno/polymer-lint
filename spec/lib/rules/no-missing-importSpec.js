@@ -32,6 +32,23 @@ describe('no-missing-import', () => {
     });
   });
 
+  describe('when a built-in Polymer element is used', () => {
+    it('does not call the onError callback', () => {
+      [ 'array-selector', 'custom-style', 'dom-bind',
+        'dom-if', 'dom-repeat', 'dom-template',
+      ].forEach(name => {
+        // <dom-repeat>
+        mockParser.emit('customElementStartTag', name,
+          [], false, {});
+        // <template is="dom-repeat">
+        mockParser.emit('startTag', 'template',
+          [ { name: 'is', value: name } ], false, {});
+      });
+
+      expect(onError).not.toHaveBeenCalled();
+    });
+  });
+
   describe('when a component is used but has not been imported', () => {
     it('calls the onError callback with the expected arguments', () => {
       const badComponents = [ 'bad-component-1', 'bad-component-2', 'bad-component-3' ];
