@@ -25,7 +25,7 @@
   },
   "main": "./lib/Linter.js",
   "scripts": {
-    "lint": "eslint src spec; exit 0",
+    "lint": "eslint --ignore-pattern '/doc/*' --ignore-pattern '/lib/*' '**/*.js' ; exit 0",
     "test": "NODE_PATH=${NODE_PATH:-\"$PWD/src\"} jasmine",
     "build": "babel --presets modern-node/4.0 --source-maps false --copy-files src -d lib",
     "prepublish": "npm run build"
