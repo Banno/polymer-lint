@@ -1,0 +1,47 @@
+<link rel="import" href="other-component.html">
+
+<!-- bplint-disable no-unused-import -->
+<link rel="import" href="unused-import.html">
+
+<dom-module id="good-component">
+  <template>
+    <style>
+      /* style inside template! */
+      :host {
+        font-size: 96pt;
+      }
+    </style>
+
+    <other-component>Good import</other-component>
+
+    <div>
+      <!-- bplint-disable no-missing-import -->
+      <missing-import>Missing import</missing-import>
+    </div>
+
+    <div>[[oneWayBinding]]</div>
+
+    <div>
+      <!-- bplint-disable no-auto-binding -->
+      <span>{{autoBinding}}</span>
+    </div>
+  </template>
+
+  <!-- bplint-disable style-inside-template -->
+  <style>
+    /* Style outside template! */
+    font-weight: bold;
+  </style>
+
+  <script>
+    Polymer({ is: 'good-component' });
+  </script>
+</dom-module>
+
+<!-- bplint-disable one-component, component-name-matches-filename -->
+<dom-module id="another-component">
+  <template>Too many components!</template>
+  <script>
+    Polymer({ is: 'another-component' });
+  </script>
+</dom-module>

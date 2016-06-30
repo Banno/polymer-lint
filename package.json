@@ -48,7 +48,9 @@
     "eslint": "^2.13.1",
     "eslint-config-google": "^0.6.0",
     "eslint-plugin-jasmine": "^1.8.1",
+    "googlediff": "^0.1.0",
     "gulp-util": "^3.0.7",
-    "jasmine": "^2.4.1"
+    "jasmine": "^2.4.1",
+    "shelljs": "^0.7.0"
   }
 }

@@ -12,7 +12,10 @@ const resolvePatterns = require('./util/resolvePatterns');
 
 function lint(files, options) {
   return Linter.lintFiles(files, options)
-    .then(results => new ConsoleReporter(options).report(results));
+    .then(results => {
+      const numErrors = new ConsoleReporter(options).report(results);
+      return numErrors ? 1 : 0;
+    });
 }
 
 /**

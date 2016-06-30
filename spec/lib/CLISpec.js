@@ -6,7 +6,10 @@ describe('CLI', () => {
   }
 
   let Options, Linter;
-  const filenames = ['./example/missing-import.html', './example/unused-import.html'];
+  const filenames = [
+    './spec/integration/good-component.html',
+    './spec/integration/bad-component.html',
+  ];
 
   beforeEach(() => {
     Options = require('Options');
