@@ -83,6 +83,36 @@ define `foo-component`.
 </dom-module>
 ```
 
+###### Error
+
+```html
+<dom-module id="my-component">
+  <template>
+    <foo-component/>
+  </template>
+</dom-module>
+```
+
+###### Error
+
+```html
+<dom-module id="my-component">
+  <template>
+    <button is="foo-component">Submit</button>
+  </template>
+</dom-module>
+```
+
+###### Error
+
+```html
+<dom-module id="my-component">
+  <template>
+    <style include="my-styles"></style>
+  </template>
+</dom-module>
+```
+
 #### no-unused-import
 
 Ensures that all components that are imported are used.
@@ -98,6 +128,27 @@ Ensures that all components that are imported are used.
 </dom-module>
 ```
 
+###### OK
+
+```html
+<link rel="import" href="foo-component.html"/>
+<dom-module id="my-component">
+  <template>
+    <button is="foo-component">Submit</button>
+  </template>
+</dom-module>
+```
+
+###### OK
+
+```html
+<link rel="import" href="my-styles.html"/>
+<dom-module id="my-component">
+  <template>
+    <style include="my-styles"></style>
+  </template>
+</dom-module>
+```
 
 ###### Error
 
