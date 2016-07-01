@@ -32,9 +32,9 @@ function processPattern({ cwd = process.cwd(), ext } = {}) {
 
 /**
  * Iterates over the given array of patterns and returns the concatenated
- * matching file paths. If any pattern's is the name of a directory that
- * exists, all files with the given extension(s) in the tree descending from
- * that directory will be returned.
+ * matching file paths. If any pattern is the name of a directory that exists,
+ * all files with the given extension(s) in the tree descending from that
+ * directory will be returned.
  *
  * @function resolvePatterns
  * @memberof module:lib/util

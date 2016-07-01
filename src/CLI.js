@@ -7,22 +7,11 @@
 const ConsoleReporter = require('./reporters/ConsoleReporter');
 const Linter = require('./Linter');
 const Options = require('./Options');
-const rules = require('./rules');
 
 const resolvePatterns = require('./util/resolvePatterns');
 
-function enabledRules({ rules: ruleNames }) {
-  if (!(ruleNames && ruleNames.length)) {
-    return rules;
-  }
-
-  return ruleNames.reduce(
-    (enabled, name) => Object.assign({}, enabled, { [name]: rules[name] })
-  , {});
-}
-
 function lint(files, options) {
-  return Linter.lintFiles(files, enabledRules(options))
+  return Linter.lintFiles(files, options)
     .then(results => new ConsoleReporter(options).report(results));
 }
 
