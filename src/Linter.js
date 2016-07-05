@@ -67,7 +67,7 @@ function locationSort({ location: locA }, { location: locB }) {
   if (locA.line === locB.line) {
     return locA.col - locB.col;
   }
-  return locA.line - locB.col;
+  return locA.line - locB.line;
 }
 
 function sortByLocation(errors) {
