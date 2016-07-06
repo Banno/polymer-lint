@@ -54,7 +54,7 @@ module.exports = function noUnusedImport(context, parser, onError) {
         continue;
       }
       onError({
-        message: `Component <${name}> was imported but never used`,
+        message: `Component '${name}' was imported but never used`,
         location,
       });
     }
