@@ -59,7 +59,7 @@ describe('no-unused-import', () => {
 
     it('calls the onError callback with the expected arguments', () => {
       expect(onError).toHaveBeenCalledWith({
-        message: `Component <${componentName}> was imported but never used`,
+        message: `Component '${componentName}' was imported but never used`,
         location,
       });
     });
