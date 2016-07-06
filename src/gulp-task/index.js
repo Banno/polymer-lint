@@ -125,9 +125,10 @@ module.exports.report = function report(options = {}) {
 
     callback(null, file);
     return;
-  }, function() {
+  }, function(callback) {
     try {
       reporter.reportSummary(totalErrors);
+      callback();
     } catch (err) {
       this.emit('error', new PluginError(PLUGIN_NAME, err));
     }
@@ -170,10 +171,12 @@ module.exports.reportAtEnd = function reportAtEnd(options = {}) {
     }
 
     callback(null, file);
+    return;
   }, function(file, enc, callback) {
     try {
       const reporter = _reporter(options);
       reporter.report(results);
+      callback();
     } catch (err) {
       this.emit('error', new PluginError(PLUGIN_NAME, err));
     }
