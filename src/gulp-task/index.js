@@ -172,7 +172,7 @@ module.exports.reportAtEnd = function reportAtEnd(options = {}) {
 
     callback(null, file);
     return;
-  }, function(file, enc, callback) {
+  }, function(callback) {
     try {
       const reporter = _reporter(options);
       reporter.report(results);
