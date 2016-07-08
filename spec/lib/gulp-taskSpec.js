@@ -29,8 +29,8 @@ describe('gulp-polymer-lint', () => {
       const [ { polymerLint } ] = onData.calls.argsFor(0);
 
       expect(polymerLint.errors).toEqual([
+        jasmine.objectContaining({ rule: 'no-unused-import' }),
         jasmine.objectContaining({ rule: 'no-missing-import' }),
-        jasmine.objectContaining({ rule: 'no-unused-import' })
       ]);
 
       expect(polymerLint.context.filename).toEqual(filename);
