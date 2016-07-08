@@ -10,6 +10,7 @@ Table of Contents
     - [Command line](#command-line)
     - [Rules](#rules)
       - [component-name-matches-filename](#component-name-matches-filename)
+      - [no-auto-binding](#no-auto-binding)
       - [no-missing-import](#no-missing-import)
       - [no-unused-import](#no-unused-import)
       - [one-component](#one-component)
@@ -52,16 +53,42 @@ Ensures that the component defined in a file matches its filename.
 
 ###### OK
 
+In a file named `foo-component.html`:
+
 ```html
-<!-- file: foo-component.html -->
 <dom-module id="foo-component">...</dom-module>
 ```
 
 ###### Error
 
+In a file named `foo-component.html`:
+
 ```html
-<!-- file: foo-component.html -->
 <dom-module id="other-component">...</dom-module>
+```
+
+#### no-auto-binding
+
+Ensures that only one-way bindings (`[[val]]`) are used.
+
+###### OK
+
+```html
+<a href="[[val]]">Hello</a>
+```
+
+```html
+<p>[[val]]</p>
+```
+
+###### Error
+
+```html
+<a href="{{val}}">Hello</a>
+```
+
+```html
+<p>{{val}}</p>
 ```
 
 #### no-missing-import
