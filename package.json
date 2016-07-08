@@ -1,6 +1,6 @@
 {
   "name": "polymer-lint",
-  "version": "0.6.6",
+  "version": "0.7.0",
   "description": "Polymer Linter",
   "author": "Jordan Running <jordan.running@banno.com>",
   "license": "Apache-2.0",
