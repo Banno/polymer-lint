@@ -1,15 +1,7 @@
 const path = require('path');
 const { sprintf } = require('sprintf-js');
 const _chalk = require('chalk');
-
-// Drop errors for rules that are disabled by the `bplint-disable` directive
-function filterErrors(errors, stack) {
-  return errors.filter(({ location, rule }) => {
-    const directives = stack.snapshotAtLocation(location);
-    const disabledRules = directives.getDirectiveArgs('bplint-disable');
-    return disabledRules.indexOf(rule) < 0;
-  });
-}
+const filterErrors = require('../util/filterErrors');
 
 /**
  * Calculates the maximum width of each of the line, col, and message
