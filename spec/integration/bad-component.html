@@ -1,0 +1,41 @@
+<link rel="import" href="other-component.html">
+<link rel="import" href="unused-import.html">
+
+<dom-module id="b4d-c0mp0n3n7">
+  <template>
+    <style>
+      /* style inside template is okay */
+      :host {
+        font-size: 96pt;
+      }
+    </style>
+
+    <other-component>Good import</other-component>
+
+    <div>
+      <missing-import>Missing import</missing-import>
+    </div>
+
+    <div>[[oneWayBindingsAreOkay]]</div>
+
+    <div>
+      <span>{{autoBindingsAreBad}}</span>
+    </div>
+  </template>
+
+  <style>
+    /* style outside template is bad! */
+    font-weight: bold;
+  </style>
+
+  <script>
+    Polymer({ is: 'bad-component' });
+  </script>
+</dom-module>
+
+<dom-module id="another-component">
+  <template>Too many components!</template>
+  <script>
+    Polymer({ is: 'another-component' });
+  </script>
+</dom-module>
