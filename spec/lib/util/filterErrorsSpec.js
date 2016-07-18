@@ -1,27 +1,30 @@
 const { PassThrough } = require('stream');
-const filterErrors = require('util/filterErrors');
 const Linter = require('Linter');
-
-// This is a rule that reports an error for every startTag, with the ruleName
-// equal to the startTag's name.
-function noisyRule(context, parser, onError) {
-  parser.on('startTag', (name, attrs, selfClosing, location) => {
-    onError({
-      rule: name,
-      message: `You broke rule ${name}`,
-      location,
-    });
-  });
-}
+const getAttribute = require('util/getAttribute');
+const filterErrors = require('util/filterErrors');
 
 describe('filterErrors', () => {
+  // This is a rule that reports an error for every startTag, with the ruleName
+  // equal to the startTag's name.
+  function noisyRule(context, parser, onError) {
+    parser.on('startTag', (name, attrs, selfClosing, location) => {
+      onError({
+        rule: name,
+        message: getAttribute(attrs, 'message') || '',
+        location,
+      });
+    });
+  }
+
+  function lint(dok, done) {
+    const linter = new Linter({ 'noisy-rule': noisyRule });
+    const stream = new PassThrough();
+
+    stream.end(dok);
+    return linter.lintStream(stream)//.then(result => {
+  }
+
   const obj = jasmine.objectContaining;
-
-  let linter;
-
-  beforeEach(() => {
-    linter = new Linter({ 'noisy-rule': noisyRule });
-  });
 
   describe('bplint-disable', () => {
     const doc = helpers.unindent(`
@@ -38,26 +41,72 @@ describe('filterErrors', () => {
       <ln-11-no-err></ln-11-no-err>
       <ln-12-err></ln=12-err>
     `);
-    let stream, lintResult;
 
-    beforeEach((done) => {
-      stream = new PassThrough();
-      stream.end(doc);
-      linter.lintStream(stream).then(result => {
-        lintResult = result;
+    it('returns the expected errors', done => {
+      lint(doc).then(({ errors, context }) => {
+        const result = filterErrors(errors, context.stack);
+
+        expect(result).toEqual([
+          obj({ rule: 'ln-1-err', location: obj({ line: 1, col: 1 }) }),
+          obj({ rule: 'ln-2-err', location: obj({ line: 2, col: 3 }) }),
+          obj({ rule: 'ln-3-err', location: obj({ line: 3, col: 5 }) }),
+          obj({ rule: 'ln-12-err', location: obj({ line: 12, col: 1 }) }),
+        ]);
+
         done();
       });
     });
+  });
 
-    it('it returns the expected errors', () => {
-      const errors = filterErrors(lintResult.errors, lintResult.context.stack);
+  describe('bplint-enable', () => {
+    const doc = helpers.unindent(`
+      <!-- bplint-enable x-elm -->
+      <x-elm message="line 2 error"></x-elm>
+      <!-- bplint-disable x-elm -->
+      <x-elm message="no error"></x-elm>
+    `);
 
-      expect(errors).toEqual([
-        obj({ rule: 'ln-1-err', location: obj({ line: 1, col: 1 }) }),
-        obj({ rule: 'ln-2-err', location: obj({ line: 2, col: 3 }) }),
-        obj({ rule: 'ln-3-err', location: obj({ line: 3, col: 5 }) }),
-        obj({ rule: 'ln-12-err', location: obj({ line: 12, col: 1 }) }),
-      ]);
+    it('returns the expected errors', done => {
+      lint(doc).then(({ errors, context }) => {
+        const result = filterErrors(errors, context.stack);
+
+        expect(result).toEqual([
+          obj({ rule: 'x-elm', message: 'line 2 error', location: obj({ line: 2, col: 1 }) }),
+        ]);
+
+        done();
+      });
+    });
+  });
+
+  describe('bplint-enable', () => {
+    const doc = helpers.unindent(`
+      <!-- bplint-disable x-elm, y-elm -->
+      <x-elm message="no error"></x-elm>
+      <!-- bplint-enable x-elm -->
+      <x-elm message="line 4 error"></x-elm>
+      <y-elm message="no error">
+        <x-elm message="line 6 error"></x-elm>
+        <!-- bplint-enable y-elm -->
+        <y-elm message="line 8 error"></y-elm>
+        <!-- bplint-disable y-elm -->
+        <y-elm message="no error"></y-elm>
+      </y-elm>
+      <y-elm message="no error"></y-elm>
+    `);
+
+    it('returns the expected errors', done => {
+      lint(doc).then(({ errors, context }) => {
+        const result = filterErrors(errors, context.stack);
+
+        expect(result).toEqual([
+          obj({ rule: 'x-elm', message: 'line 4 error', location: obj({ line: 4, col: 1 }) }),
+          obj({ rule: 'x-elm', message: 'line 6 error', location: obj({ line: 6, col: 3 }) }),
+          obj({ rule: 'y-elm', message: 'line 8 error', location: obj({ line: 8, col: 3 }) }),
+        ]);
+
+        done();
+      });
     });
   });
 });

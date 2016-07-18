@@ -118,7 +118,7 @@ function parseDirectiveArgs(argsStr) {
     .filter(arg => arg.length);
 }
 
-const MATCH_DIRECTIVE_COMMENT = /^\s*(bplint-disable)\s*(.*?)\s*$/;
+const MATCH_DIRECTIVE_COMMENT = /^\s*(bplint-(?:enable|disable))\s*(.*?)\s*$/;
 
 // Elements that are implicitly self-closing
 const VOID_ELEMENTS = {
