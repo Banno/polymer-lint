@@ -2,6 +2,7 @@ const EventEmitter = require('events').EventEmitter;
 const DirectiveStack = require('DirectiveStack');
 
 describe('DirectiveStack', () => {
+  const obj = jasmine.objectContaining;
   let mockParser, stack;
 
   beforeEach(() => {
@@ -37,50 +38,59 @@ describe('DirectiveStack', () => {
       });
     });
 
-    describe('getDirectiveArgs', () => {
+    describe('getDirectives', () => {
       beforeEach(() => {
         mockParser.emit('linterDirective', 'some-other-directive', [], {});
       });
 
-      describe('when the given directive hasn\'t been encountered', () => {
+      describe('when the given directives haven\'t been encountered', () => {
         it('returns an empty array', () => {
-          mockParser.emit('linterDirective', 'foo', [], {});
-          expect(stack.getDirectiveArgs('not-foo')).toEqual([]);
+          expect(stack.getDirectives('directive-a', 'directive-b'))
+            .toEqual([]);
         });
       });
 
-      describe('when given directive has been encountered', () => {
-        beforeEach(() => {
-          mockParser.emit('linterDirective', 'foo', ['bar', 'baz'], {});
+      describe('when the given directives have been encountered', () => {
+        it('returns the expected objects', () => {
+          mockParser.emit('linterDirective', 'ignore-me', ['ignore-me-arg'], { line: 1, col: 10 });
+          mockParser.emit('linterDirective', 'directive-a', ['a-arg-1-1', 'a-arg-1-2'], { line: 2, col: 20 });
+          mockParser.emit('linterDirective', 'ignore-me-too', ['ignore-me-too-arg'], { line: 3, col: 30 });
+          mockParser.emit('linterDirective', 'directive-b', ['b-arg'], { line: 4, col: 40 });
+          mockParser.emit('linterDirective', 'directive-a', ['a-arg-2'], { line: 5, col: 50 });
+
+          expect(stack.getDirectives('directive-a', 'directive-b'))
+            .toEqual([
+              { name: 'directive-a', args: ['a-arg-1-1', 'a-arg-1-2'], location: { line: 2, col: 20 } },
+              { name: 'directive-b', args: ['b-arg'], location: { line: 4, col: 40 } },
+              { name: 'directive-a', args: ['a-arg-2'], location: { line: 5, col: 50 } },
+            ]);
         });
+      });
 
-        it('returns its arguments', () => {
-          expect(stack.getDirectiveArgs('foo')).toEqual(['bar', 'baz']);
-          expect(stack.getDirectiveArgs('foo', { flatten: false }))
-            .toEqual([['bar', 'baz']]);
-        });
+      describe('in different scopes', () => {
+        it('returns the expected objects', () => {
+          mockParser.emit('linterDirective', 'directive-a', ['a-arg-1-1', 'a-arg-1-2'], { line: 1, col: 1 });
+          mockParser.emit('linterDirective', 'ignore-me', ['ignore-me-arg'], { line: 2, col: 3 });
+          mockParser.emit('enterScope', {});
+            mockParser.emit('linterDirective', 'ignore-me-too', ['ignore-me-too-arg'], { line: 4, col: 7 });
+            mockParser.emit('linterDirective', 'directive-a', ['a-arg-2'], { line: 5, col: 9 });
+            mockParser.emit('linterDirective', 'directive-b', ['b-arg-1'], { line: 6, col: 11 });
+          mockParser.emit('leaveScope', {});
+          mockParser.emit('linterDirective', 'directive-b', ['b-arg-2-1', 'b-arg-2-2'], { line: 8, col: 13 });
+          mockParser.emit('linterDirective', 'directive-a', ['a-arg-3'], { line: 9, col: 15 });
 
-        describe('and then encountered again', () => {
-          beforeEach(() => {
-            mockParser.emit('enterScope', {});
-            mockParser.emit('linterDirective', 'foo', ['qux'], {});
-          });
-
-          it('returns their arguments', () => {
-            expect(stack.getDirectiveArgs('foo'))
-              .toEqual(['bar', 'baz', 'qux']);
-            expect(stack.getDirectiveArgs('foo', { flatten: false }))
-              .toEqual([['bar', 'baz'], ['qux']]);
-          });
+          expect(stack.getDirectives('directive-a', 'directive-b'))
+            .toEqual([
+              { name: 'directive-a', args: ['a-arg-1-1', 'a-arg-1-2'], location: { line: 1, col: 1 } },
+              { name: 'directive-b', args: ['b-arg-2-1', 'b-arg-2-2'], location: { line: 8, col: 13 } },
+              { name: 'directive-a', args: ['a-arg-3'], location: { line: 9, col: 15 } },
+            ]);
         });
       });
     });
 
-    describe('clone', () => {
-    });
-
-    describe('snapshot', () => {
-    });
+    xdescribe('clone', () => {});
+    xdescribe('snapshot', () => {});
 
     describe('snapshotAtLocation', () => {
       const events = [
@@ -95,15 +105,39 @@ describe('DirectiveStack', () => {
       ];
 
       const expectedSnapshots = [
-        [ 1, [ {} ] ],
-        [ 3, [ {} ] ],
-        [ 5, [ {}, { foo: [['xyz']] } ] ],
-        [ 7, [ {}, { foo: [['xyz']] } ] ],
-        [ 9, [ {}, { foo: [['xyz']] }, { foo: [[]] } ] ],
-        [ 11, [ {}, { foo: [['xyz']] }, { foo: [[]], bar: [['abc']] } ] ],
-        [ 13, [ {}, { foo: [['xyz']] } ] ],
-        [ 15, [ {}, { foo: [['xyz']], baz: [[]] } ] ],
-        [ 17, [ {} ] ],
+        [  1, [ [] ] ],
+        [  3, [ [] ] ],
+        [  5, [ [],
+                [ { name: 'foo', args: ['xyz'], location: { line: 4, col: 1 } } ],
+              ],
+        ],
+        [  7, [ [],
+                [ { name: 'foo', args: ['xyz'], location: { line: 4, col: 1 } } ],
+              ],
+        ],
+        [  9, [ [],
+                [ { name: 'foo', args: ['xyz'], location: { line: 4, col: 1 } } ],
+                [ { name: 'foo', args: [], location: { line: 8, col: 1 } } ],
+              ],
+        ],
+        [ 11, [ [],
+                [ { name: 'foo', args: ['xyz'], location: { line: 4, col: 1 } } ],
+                [ { name: 'foo', args: [], location: { line: 8, col: 1 } },
+                  { name: 'bar', args: ['abc'], location: { line: 10, col: 1 } },
+                ],
+              ],
+        ],
+        [ 13, [ [],
+                [ { name: 'foo', args: ['xyz'], location: { line: 4, col: 1 } } ],
+              ],
+        ],
+        [ 15, [ [],
+                [ { name: 'foo', args: ['xyz'], location: { line: 4, col: 1 } },
+                  { name: 'baz', args: [], location: { line: 14, col: 1 } },
+                ],
+              ],
+        ],
+        [ 17, [ [] ] ],
       ];
 
       beforeEach(() => {
@@ -130,11 +164,17 @@ describe('DirectiveStack', () => {
 
         it('returns the expected snapshots for the given locations', () => {
           expect(stack.snapshotAtLocation({ line: 18, col: 1 }))
-            .toEqual([{}]);
+            .toEqual([[]]);
           expect(stack.snapshotAtLocation({ line: 18, col: 25 }))
-            .toEqual([ { 'directive-x': [['abc']] } ]);
+            .toEqual([
+              [ { name: 'directive-x', args: ['abc'], location: { line: 18, col: 5 } } ],
+            ]);
           expect(stack.snapshotAtLocation({ line: 18, col: 47 }))
-            .toEqual([ { 'directive-x': [['abc']], 'directive-y': [['def']] } ]);
+            .toEqual([
+              [ { name: 'directive-x', args: ['abc'], location: { line: 18, col: 5 } },
+                { name: 'directive-y', args: ['def'], location: { line: 18, col: 26 } },
+              ]
+            ]);
         });
       });
     });
@@ -142,7 +182,7 @@ describe('DirectiveStack', () => {
 
   describe('before any events have been received', () => {
     it('has an empty object on top of the stack', () => {
-      expect(stack.peek()).toEqual({});
+      expect(stack.peek()).toEqual([]);
     });
   });
 
@@ -152,7 +192,7 @@ describe('DirectiveStack', () => {
     });
 
     it('the object on top of the stack has one property', () => {
-      expect(stack.peek()).toEqual({ foo: [['bar']] });
+      expect(stack.peek()).toEqual([ { name: 'foo', args: ['bar'], location: {} } ]);
     });
 
     describe('and a second linterDirective event with the same name has ' +
@@ -163,7 +203,10 @@ describe('DirectiveStack', () => {
 
       it('the object on top of the stack has one properties and two sets ' +
          'of args', () => {
-        expect(stack.peek()).toEqual({ foo: [['bar'], ['baz']] });
+        expect(stack.peek()).toEqual([
+          { name: 'foo', args: ['bar'], location: {} },
+          { name: 'foo', args: ['baz'], location: {} },
+        ]);
       });
 
       describe('and a third linterDirective event with a different name has ' +
@@ -173,7 +216,11 @@ describe('DirectiveStack', () => {
         });
 
         it('the object on top of the stack has two properties', () => {
-          expect(stack.peek()).toEqual({ foo: [['bar'], ['baz']], qux: [[]] });
+          expect(stack.peek()).toEqual([
+            { name: 'foo', args: ['bar'], location: {} },
+            { name: 'foo', args: ['baz'], location: {} },
+            { name: 'qux', args: [], location: {} },
+          ]);
         });
       });
     });
@@ -183,7 +230,10 @@ describe('DirectiveStack', () => {
     it('a new empty object has been pushed onto the stack', () => {
       mockParser.emit('linterDirective', 'foo', [], {});
       mockParser.emit('enterScope', {});
-      expect(stack).toEqual([ { foo: [[]] }, {} ]);
+      expect(stack).toEqual([
+        [ { name: 'foo', args: [], location: {} } ],
+        [],
+      ]);
     });
   });
 
@@ -192,9 +242,15 @@ describe('DirectiveStack', () => {
       mockParser.emit('linterDirective', 'foo', [], {});
       mockParser.emit('enterScope', {});
       mockParser.emit('linterDirective', 'bar', [], {});
-      expect(stack).toEqual([ { foo: [[]] }, { bar: [[]] } ]);
+
+      expect(stack).toEqual([
+        [ { name: 'foo', args: [], location: {} } ],
+        [ { name: 'bar', args: [], location: {} } ]
+      ]);
+
       mockParser.emit('leaveScope', {});
-      expect(stack).toEqual([ { foo: [[]] } ]);
+
+      expect(stack).toEqual([ [ { name: 'foo', args: [], location: {} } ] ]);
     });
   });
 });

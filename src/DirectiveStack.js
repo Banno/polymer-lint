@@ -1,17 +1,13 @@
 /**
- * @typedef {string[]} DirectiveArgs
+ * @typedef {{name: string, args: string[], location: LocationInfo}} Directive
  * @memberof DirectiveStack
  */
 
 /**
- * @typedef {DirectiveStack.DirectiveArgs[]} DirectiveArgsStack
+ * @typedef {DirectiveStack.Directive[]} DirectiveScope
  * @memberof DirectiveStack
  */
 
-/**
- * @typedef {Object.<string, DirectiveStack.DirectiveArgsStack>} DirectiveArgsStackObject
- * @memberof DirectiveStack
- */
 
 // Private methods
 const onDirective = Symbol('onDirective');
@@ -31,42 +27,33 @@ const snapshots = Symbol('snapshots');
  * ### The stack
 
  * DirectiveStack acts like a stack. Each item in the stack is a
- * [DirectiveArgsStackObject]{@link DirectiveStack.DirectiveArgsStackObject}
- * of the form:
+ * [DirectiveScope]{@link DirectiveStack.DirectiveScope}, which is an array of
+ * {@link DirectiveStack.Directive} objects of the form:
  *
  * ```javascript
- * { 'directive-name': [
- *     [ 'arg1', 'arg2', ... ],
- *     // ...
- *   ],
- *   // ...
+ * { name: 'directive-name',
+ *   args: [ 'arg1', 'arg2', ... ],
+ *   location: { line: 10, col: 20 }
  * }
  * ```
- *
- * In other words, each property's name is the name of a linter directive and
- * the corresponding value is an array of arrays of the arguments that have been
- * collected for that directive ([DirectiveArgsStack]{@link DirectiveStack.DirectiveArgsStack}).
  *
  * DirectiveStack listens for events emitted by the {@link SAXParser} given to
  * its [listenTo]{@link DirectiveStack#listenTo} method for the
  * `linterDirective`, `enterScope`, and `leaveScope` events. It responds in the following ways:
  *
- *   * {@link SAXParser.event:linterDirective} - If the
- *     [DirectiveArgsStackObject]{@link DirectiveStack.DirectiveArgsStackObject}
- *     on top of the stack does not have a property with the name of the
- *     directive given by the event, one is initialized with an empty array
- *     ([DirectiveArgsStack]{@link DirectiveStack.DirectiveArgsStack}). Then the
- *     [DirectiveArgs]{@link DirectiveStack.DirectiveArgs} given by the event
- *     are pushed onto that array.
+ *   * {@link SAXParser.event:linterDirective} - A [Directive]{@link DirectiveStack.Directive}
+ *     object is initialized with properties equal to the `name`, `args`, and
+ *     `location` arguments given by the event.
  *
  *     A snapshot is recorded (see [Snapshots](#snapshots)).
  *
  *   * {@link SAXParser.event:enterScope} - A new, empty
- *     [DirectiveArgsStackObject]{@link DirectiveStack.DirectiveArgsStackObject}
+ *     [DirectiveScope]{@link DirectiveStack.DirectiveScope}
  *     is pushed onto the stack.
  *
- *   * {@link SAXParser.event:leaveScope} - The top object is popped from the
- *     stack and a snapshot is recorded (see [Snapshots](#snapshots)).
+ *   * {@link SAXParser.event:leaveScope} - The top DirectiveScope array is
+ *     popped from the stack and a snapshot is recorded
+ *     (see [Snapshots](#snapshots)).
  *
  * ### Example
  *
@@ -87,17 +74,17 @@ const snapshots = Symbol('snapshots');
  * Before the parser parses line 1, the stack looks like this:
  *
  * ```text
- * top|bottom {}
+ * top|bottom []
  * ```
  *
- * The empty [DirectiveArgsStackObject]{@link DirectiveStack.DirectiveArgsStackObject}
+ * The empty [DirectiveScope]{@link DirectiveStack.DirectiveScope}
  * represents the root scope. It's empty because no directives have been
  * encountered yet. After the parser parses line 1, the stack looks like this:
  *
  * ```text
  * # After line 1
- *    top {}
- * bottom {}
+ *    top []
+ * bottom []
  * ```
  *
  * The parser entered a new scope (`<foo>`), so a new, empty object has been
@@ -106,8 +93,8 @@ const snapshots = Symbol('snapshots');
  *
  * ```text
  * # After line 2
- *    top { directive-x: [ [ grumpy, sleepy ] ] }
- * bottom {}
+ *    top [ { name: 'directive-x', args: [ grumpy, sleepy ], location: ... } ]
+ * bottom []
  * ```
  *
  * Fast-forward to line 7. The parser has entered a new scope (`<bar>`) and
@@ -116,9 +103,10 @@ const snapshots = Symbol('snapshots');
  *
  * ```text
  * # After line 6
- *    top { directive-x: [ [ sneezy ] ], directive-y: [ [ doc ] ] }
- *      ⋮ { directive-x: [ [ grumpy, sleepy ] ] }
- * bottom {}
+ *    top [ { name: 'directive-x', args: [ sneezy ], ... },
+ *          { name: 'directive-y', args: [ doc ], ... } ]
+ *      ⋮ [ { name: 'directive-x', args: [ grumpy, sleepy ] } ]
+ * bottom []
  * ```
  *
  * Inspecting the stack we can see which directives are "in effect," i.e. which
@@ -127,19 +115,15 @@ const snapshots = Symbol('snapshots');
  * `sleepy` and once with the argument `sneezy`, and `directive-y` was
  * encountered once with the argument `doc`.
  *
- * DirectiveStack provides a convenience method [getDirectiveArgs]{@link DirectiveStack#getDirectiveArgs}
- * that will traverse the stack and return an array of the arguments encountered
- * with the given directive name. By default it concatenates all of the
- * [DirectiveArgs]{@link DirectiveStack.DirectiveArgs} arrays into a
- * single array.
+ * DirectiveStack provides a convenience method [getDirectives]{@link DirectiveStack#getDirectives}
+ * that will traverse the stack and return an flat array of the Directives
+ * encountered with the given directive name(s). For example:
  *
  * ```javascript
  * // After line 6
- * stack.getDirectiveArgs('directive-x');
- * // => [ 'grumpy', 'sleepy', 'sneezy' ]
- *
- * stack.getDirectiveArgs('directive-x', { flatten: false });
- * // => [ [ 'grumpy', 'sleepy' ], [ 'sneezy' ] ]
+ * stack.getDirective('directive-x');
+ * // => [ { name: 'directive-x', args: ['grumpy', 'sleepy'], ... },
+ * //      { name: 'directive-x', args: ['sneezy'], ... } ]
  * ```
  *
  * On line 8 the parser leaves the `<bar>` scope, so the top of the stack is
@@ -147,7 +131,7 @@ const snapshots = Symbol('snapshots');
  *
  * ```text
  * # After line 8
- *    top { directive-x: [ [ grumpy, sleepy ] ] }
+ *    top [ { name: 'directive-x', args: [ grumpy, sleepy ] } ]
  * bottom {}
  * ```
  *
@@ -187,19 +171,19 @@ const snapshots = Symbol('snapshots');
  * ```javascript
  * stack.snapshotAtLocation({ line: 5, col: 1 });
  * // => DirectiveStack [
- * //      {},
- * //      { 'directive-x': [ [ 'bashful', 'dopey' ] ] },
- * //      { 'directive-y': [ [ 'happy' ] ] }
+ * //      [],
+ * //      [ { name: 'directive-x', args: [ 'bashful', 'dopey' ], location: { line: 2, col: 3 } } ],
+ * //      [ { name: 'directive-y': args: [ 'happy' ], location: { line: 4, col: 5 } } ]
  * //    ]
  *
  * stack.snapshotAtLocation({ line: 7, col: 1 });
  * // => DirectiveStack [
- * //      {},
- * //      { 'directive-x': [ [ 'bashful', 'dopey' ] ] }
+ * //      [],
+ * //      [ { name: 'directive-x', args: [ 'bashful', 'dopey' ], location: { line: 2, col: 3 } } ],
  * //    ]
  *
  * stack.snapshotAtLocation({ line: 9, col: 1 });
- * // => DirectiveStack [ {} ]
+ * // => DirectiveStack [ [] ]
  * ```
  */
 class DirectiveStack extends Array {
@@ -210,7 +194,7 @@ class DirectiveStack extends Array {
    */
   constructor({ snapshot = true } = {}) {
     super();
-    this.push({}); // initialize with root object
+    this.push([]); // initialize with root scope
     if (snapshot) {
       this[initSnapshots]();
     }
@@ -224,29 +208,27 @@ class DirectiveStack extends Array {
   }
 
   /**
-   * Returns the item on top of the stack without popping it
-   * @return {DirectiveStack.DirectiveArgsStackObject}
+   * Returns the DirectiveScope array on top of the stack without popping it
+   * @return {DirectiveStack.DirectiveScope}
    */
   peek() {
     return this[this.length - 1];
   }
 
   /**
-   * Get the arguments for the given directive from the stack.
+   * Returns a flat array of directives on the stack with the given name(s). If
+   * no arguments are given, all directives are returned.
    *
-   * @param {string} name - The name of the directive
-   * @param {Object} options
-   * @param {boolean} [options.flatten=true]
-   *    If true, the arguments will be flattened into a single Array
-   * @return {string[]|Array.<string[]>}
+   * @param {...string} directiveNames - The names of the directives to return
+   * @return {DirectiveStack.Directive[]} - The matching directives
    */
-  getDirectiveArgs(name, { flatten = true } = {}) {
-    return this.reduce((args, item) => {
-      if (!item.hasOwnProperty(name)) {
-        return args;
-      }
-      return args.concat(...(flatten ? item[name] : [ item[name] ]));
-    }, []);
+  getDirectives(...directiveNames) {
+    return this.reduce((directives, scope) => directives.concat(
+      directiveNames.length ?
+        scope.filter(({ name }) => {
+          return directiveNames.indexOf(name) !== -1;
+        }) : scope
+    ), []);
   }
 
   /**
@@ -312,17 +294,13 @@ class DirectiveStack extends Array {
   }
 
   [onDirective](name, args, location) {
-    const top = Object.assign({}, this.pop());
-    const topArgs = top[name] || [];
-    topArgs.push(args);
-    top[name] = topArgs;
-    this.push(top);
-
+    const top = this.pop();
+    this.push([ ...top, { name, args, location } ]);
     this.snapshot(location);
   }
 
   [onEnterScope]() {
-    this.push({}); // push object for new scope
+    this.push([]); // push object for new scope
   }
 
   [onLeaveScope](location) {

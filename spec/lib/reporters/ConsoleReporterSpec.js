@@ -20,10 +20,10 @@ describe('ConsoleReporter', () => {
   });
 
   describe('instance methods', () => {
-    function mockStack(directiveArgs = []) {
+    function mockStack(directives = []) {
       return {
-        getDirectiveArgs: jasmine.createSpy('getDirectiveArgs')
-                            .and.returnValue(directiveArgs),
+        getDirectives: jasmine.createSpy('getDirectiveArgs')
+                            .and.returnValue(directives),
         snapshotAtLocation: jasmine.createSpy('snapshotAtLocation')
                               .and.callFake(() => mockStack()),
       };
@@ -89,7 +89,9 @@ describe('ConsoleReporter', () => {
       describe('when a rule is disabled', () => {
         beforeEach(() => {
           context.stack.snapshotAtLocation
-            .and.returnValue(mockStack(['rule-a']));
+            .and.returnValue(mockStack([
+              { name: 'bplint-disable', args: ['rule-a'], location: {} } ,
+            ]));
           reporter.reportFile(errors, context);
         });
 
