@@ -267,11 +267,38 @@ The `polymer-lint` output for the above would be:
 ```text
 $ polymer-lint my-component.html
 my-component.html
-  3:5 Custom element <mystery-component-1> used but not imported no-missing-import
-  7:3 Custom element <mystery-component-3> used but not imported no-missing-import
+  3:5  Custom element 'mystery-component-1' used but not imported  no-missing-import
+  7:3  Custom element 'mystery-component-3' used but not imported  no-missing-import
 
 ✖ 2 errors
 ```
+
+#### bplint-enable
+
+The `bplint-enable` directive negates the action of the `bplint-disable`
+directive from this point on, within the current scope. For example:
+
+```html
+<dom-module id="my-component">
+  <!-- bplint-disable no-missing-import -->
+  <mystery-component-1/>
+  <!-- bplint-enable no-missing-import -->
+  <mystery-component-2/>
+</dom-module>
+```
+
+Neither `mystery-component-1` nor `mystery-component-2` has been imported, but
+an error will be reported only for `mystery-component-2`.  The `polymer-lint`
+output for the above would be:
+
+```text
+$ polymer-lint my-component.html
+my-component.html
+  5:3  Custom element 'mystery-component-2' used but not imported  no-missing-import
+
+✖ 2 errors
+```
+
 
 ### Gulp task
 
