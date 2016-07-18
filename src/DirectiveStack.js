@@ -8,7 +8,6 @@
  * @memberof DirectiveStack
  */
 
-
 // Private methods
 const onDirective = Symbol('onDirective');
 const onEnterScope = Symbol('onEnterScope');
@@ -225,9 +224,9 @@ class DirectiveStack extends Array {
   getDirectives(...directiveNames) {
     return this.reduce((directives, scope) => directives.concat(
       directiveNames.length ?
-        scope.filter(({ name }) => {
-          return directiveNames.indexOf(name) !== -1;
-        }) : scope
+        scope.filter(
+          ({ name }) => directiveNames.indexOf(name) !== -1
+        ) : scope
     ), []);
   }
 

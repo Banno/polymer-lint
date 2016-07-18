@@ -2,7 +2,6 @@ const EventEmitter = require('events').EventEmitter;
 const DirectiveStack = require('DirectiveStack');
 
 describe('DirectiveStack', () => {
-  const obj = jasmine.objectContaining;
   let mockParser, stack;
 
   beforeEach(() => {
@@ -69,6 +68,7 @@ describe('DirectiveStack', () => {
 
       describe('in different scopes', () => {
         it('returns the expected objects', () => {
+          /* eslint-disable indent */
           mockParser.emit('linterDirective', 'directive-a', ['a-arg-1-1', 'a-arg-1-2'], { line: 1, col: 1 });
           mockParser.emit('linterDirective', 'ignore-me', ['ignore-me-arg'], { line: 2, col: 3 });
           mockParser.emit('enterScope', {});
@@ -105,6 +105,7 @@ describe('DirectiveStack', () => {
       ];
 
       const expectedSnapshots = [
+        /* eslint-disable no-multi-spaces */
         [  1, [ [] ] ],
         [  3, [ [] ] ],
         [  5, [ [],

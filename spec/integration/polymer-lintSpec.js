@@ -51,25 +51,23 @@ function itBehavesLike(args, filenames = []) {
       `));
     }
   };
-};
+}
 
 // Convenience methods for writing testing polymer-lint output given specific
 // arguments and filenames.
-polymerLint.withArguments = (...args) => {
-  return {
-    behavesLike: itBehavesLike(args),
+polymerLint.withArguments = (...args) => ({
+  behavesLike: itBehavesLike(args),
 
-    andFiles: (...filenames) => ({
-      behavesLike: itBehavesLike(args,
-        filenames.map(fn => helpers.relativePath(__dirname, fn))),
-    }),
+  andFiles: (...filenames) => ({
+    behavesLike: itBehavesLike(args,
+      filenames.map(fn => helpers.relativePath(__dirname, fn))),
+  }),
 
-    andPatterns: (...patterns) => ({
-      behavesLike: itBehavesLike(args,
-        patterns.map(pattern => `'${helpers.relativePath(__dirname, pattern)}'`)),
-    }),
-  };
-};
+  andPatterns: (...patterns) => ({
+    behavesLike: itBehavesLike(args,
+      patterns.map(pattern => `'${helpers.relativePath(__dirname, pattern)}'`)),
+  }),
+});
 
 describe('polymer-lint', () => {
   describe('with no arguments', () => {

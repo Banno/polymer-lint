@@ -6,7 +6,7 @@ Installation
 At present gulp-polymer-lint ships with [polymer-lint].
 
 ```sh
-$ npm install polymer-lint
+$ npm install -D polymer-lint
 ```
 
 [polymer-lint]: https://github.com/Banno/polymer-lint

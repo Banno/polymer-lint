@@ -16,12 +16,12 @@ describe('filterErrors', () => {
     });
   }
 
-  function lint(dok, done) {
+  function lint(doc, done) {
     const linter = new Linter({ 'noisy-rule': noisyRule });
     const stream = new PassThrough();
 
-    stream.end(dok);
-    return linter.lintStream(stream)//.then(result => {
+    stream.end(doc);
+    return linter.lintStream(stream);
   }
 
   const obj = jasmine.objectContaining;

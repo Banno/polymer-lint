@@ -27,7 +27,7 @@ Installation
 ------------
 
 ```sh
-$ npm install -g 'git+ssh://git@github.com:Banno/polymer-lint.git'
+$ npm install -g polymer-lint
 ```
 
 Usage

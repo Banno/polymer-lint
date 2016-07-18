@@ -1,9 +1,7 @@
 // util/filterErrors
 
-/**
- * Given an array of directives, returns the names of rules disabled by
- * bplint-disable directives and not subsequently re-enabled by bplint-enable.
- */
+// Given an array of directives, returns the names of rules disabled by
+// bplint-disable directives and not subsequently re-enabled by bplint-enable.
 function disabledRules(directives) {
   return directives.reduce((disabled, { name, args }) => {
     if (name === 'bplint-disable') {

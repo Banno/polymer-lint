@@ -90,7 +90,7 @@ describe('ConsoleReporter', () => {
         beforeEach(() => {
           context.stack.snapshotAtLocation
             .and.returnValue(mockStack([
-              { name: 'bplint-disable', args: ['rule-a'], location: {} } ,
+              { name: 'bplint-disable', args: ['rule-a'], location: {} },
             ]));
           reporter.reportFile(errors, context);
         });
