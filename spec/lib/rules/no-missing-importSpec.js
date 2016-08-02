@@ -74,4 +74,24 @@ describe('no-missing-import', () => {
       );
     });
   });
+
+  describe('when a <style include="..."> attribute has multiple names', () => {
+    it('considers each name separately and calls the onError callback with the expected arguments', () => {
+      // <style include="good-component-1 bad-component-1">
+      const location = { line: 1, col: 8, startOffset: 7, endOffset: 48 };
+
+      mockParser.emit('startTag', 'style',
+        [ { name: 'include', value: 'good-component-1 bad-component-1' } ], false,
+        { line: 1, col: 1, startOffset: 0, endOffset: 49,
+          attrs: { location },
+        }
+      );
+
+      expect(onError).toHaveBeenCalledTimes(1);
+      expect(onError).toHaveBeenCalledWith({
+        message: `Custom element \'bad-component-1\' used but not imported`,
+        location,
+      });
+    });
+  });
 });
