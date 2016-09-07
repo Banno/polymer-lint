@@ -59,53 +59,55 @@ describe('filterErrors', () => {
   });
 
   describe('bplint-enable', () => {
-    const doc = helpers.unindent(`
-      <!-- bplint-enable x-elm -->
-      <x-elm message="line 2 error"></x-elm>
-      <!-- bplint-disable x-elm -->
-      <x-elm message="no error"></x-elm>
-    `);
+    describe('simple test', () => {
+      const doc = helpers.unindent(`
+        <!-- bplint-enable x-elm -->
+        <x-elm message="line 2 error"></x-elm>
+        <!-- bplint-disable x-elm -->
+        <x-elm message="no error"></x-elm>
+      `);
 
-    it('returns the expected errors', done => {
-      lint(doc).then(({ errors, context }) => {
-        const result = filterErrors(errors, context.stack);
+      it('returns the expected errors', done => {
+        lint(doc).then(({ errors, context }) => {
+          const result = filterErrors(errors, context.stack);
 
-        expect(result).toEqual([
-          obj({ rule: 'x-elm', message: 'line 2 error', location: obj({ line: 2, col: 1 }) }),
-        ]);
+          expect(result).toEqual([
+            obj({ rule: 'x-elm', message: 'line 2 error', location: obj({ line: 2, col: 1 }) }),
+          ]);
 
-        done();
+          done();
+        });
       });
     });
-  });
 
-  describe('bplint-enable', () => {
-    const doc = helpers.unindent(`
-      <!-- bplint-disable x-elm, y-elm -->
-      <x-elm message="no error"></x-elm>
-      <!-- bplint-enable x-elm -->
-      <x-elm message="line 4 error"></x-elm>
-      <y-elm message="no error">
-        <x-elm message="line 6 error"></x-elm>
-        <!-- bplint-enable y-elm -->
-        <y-elm message="line 8 error"></y-elm>
-        <!-- bplint-disable y-elm -->
+    describe('complex test', () => {
+      const doc = helpers.unindent(`
+        <!-- bplint-disable x-elm, y-elm -->
+        <x-elm message="no error"></x-elm>
+        <!-- bplint-enable x-elm -->
+        <x-elm message="line 4 error"></x-elm>
+        <y-elm message="no error">
+          <x-elm message="line 6 error"></x-elm>
+          <!-- bplint-enable y-elm -->
+          <y-elm message="line 8 error"></y-elm>
+          <!-- bplint-disable y-elm -->
+          <y-elm message="no error"></y-elm>
+        </y-elm>
         <y-elm message="no error"></y-elm>
-      </y-elm>
-      <y-elm message="no error"></y-elm>
-    `);
+      `);
 
-    it('returns the expected errors', done => {
-      lint(doc).then(({ errors, context }) => {
-        const result = filterErrors(errors, context.stack);
+      it('returns the expected errors', done => {
+        lint(doc).then(({ errors, context }) => {
+          const result = filterErrors(errors, context.stack);
 
-        expect(result).toEqual([
-          obj({ rule: 'x-elm', message: 'line 4 error', location: obj({ line: 4, col: 1 }) }),
-          obj({ rule: 'x-elm', message: 'line 6 error', location: obj({ line: 6, col: 3 }) }),
-          obj({ rule: 'y-elm', message: 'line 8 error', location: obj({ line: 8, col: 3 }) }),
-        ]);
+          expect(result).toEqual([
+            obj({ rule: 'x-elm', message: 'line 4 error', location: obj({ line: 4, col: 1 }) }),
+            obj({ rule: 'x-elm', message: 'line 6 error', location: obj({ line: 6, col: 3 }) }),
+            obj({ rule: 'y-elm', message: 'line 8 error', location: obj({ line: 8, col: 3 }) }),
+          ]);
 
-        done();
+          done();
+        });
       });
     });
   });

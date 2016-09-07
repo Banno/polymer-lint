@@ -89,9 +89,6 @@ describe('DirectiveStack', () => {
       });
     });
 
-    xdescribe('clone', () => {});
-    xdescribe('snapshot', () => {});
-
     describe('snapshotAtLocation', () => {
       const events = [
         [ 'enterScope', { line: 2, col: 1 } ],
