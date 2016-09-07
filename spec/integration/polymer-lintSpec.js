@@ -112,7 +112,7 @@ describe('polymer-lint', () => {
           16:7  Custom element 'missing-import' used but not imported  no-missing-import
 
         spec/integration/element-card.html
-           11:5   Custom element 'iron-flex' used but not imported  no-missing-import
+           11:12  Custom element 'iron-flex' used but not imported  no-missing-import
           149:11  Custom element 'iron-icon' used but not imported  no-missing-import
 
         ✖ 4 errors
@@ -138,7 +138,7 @@ describe('polymer-lint', () => {
             4:1   Component 'catalog-element' was imported but never used      no-unused-import
             5:1   Component 'catalog-package' was imported but never used      no-unused-import
             7:1   Component 'element-action-menu' was imported but never used  no-unused-import
-           11:5   Custom element 'iron-flex' used but not imported             no-missing-import
+           11:12  Custom element 'iron-flex' used but not imported             no-missing-import
           149:11  Custom element 'iron-icon' used but not imported             no-missing-import
 
         ✖ 14 errors
