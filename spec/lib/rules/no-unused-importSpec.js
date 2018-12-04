@@ -73,7 +73,7 @@ describe('no-unused-import', () => {
       mockParser.emit('end');
     });
 
-    it('does not call the onError callback despite, polymer-element not being used', () => {
+    it('does not call the onError callback despite polymer-element not being used', () => {
       expect(onError).not.toHaveBeenCalled();
     });
   })
