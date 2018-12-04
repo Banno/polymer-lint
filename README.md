@@ -144,9 +144,14 @@ define `foo-component`.
 
 Ensures that all components that are imported are used.
 
+This rule assumes that imported filenames match the names of the elements they
+define, and ignores imports for names that don't end with `.html` or aren't
+valid custom element names. It also ignores the filename `polymer-element.html`.
+
 ###### OK
 
 ```html
+<link rel="import" href="@polymer/polymer/polymer-element.html"/>
 <link rel="import" href="foo-component.html"/>
 <dom-module id="my-component">
   <template>
