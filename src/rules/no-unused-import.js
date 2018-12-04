@@ -3,6 +3,8 @@ const componentNameFromPath = require('../util/componentNameFromPath');
 const getAttribute = require('../util/getAttribute');
 const isValidCustomElementName = require('../util/isValidCustomElementName');
 
+const exceptedTags = ['polymer-element'];
+
 /**
  * Checks if all imported components are used.
  *
@@ -19,7 +21,7 @@ module.exports = function noUnusedImport(context, parser, onError) {
 
   parser.on('importTag', (href, location) => {
     const name = componentNameFromPath(href);
-    if (name) {
+    if (name && !exceptedTags.includes(name)) {
       /**
        * Skip imports that aren't valid component names
        * @todo Is this the correct behavior?
