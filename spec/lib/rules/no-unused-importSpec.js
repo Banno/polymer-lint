@@ -64,4 +64,17 @@ describe('no-unused-import', () => {
       });
     });
   });
+
+  describe('when polymer-element is imported', () => {
+    beforeEach(() => {
+      mockParser.emit('importTag', `/foo/bar/polymer-element.html`, location);
+      // only use the base test component
+      mockParser.emit('customElementStartTag', componentName, [], false, {});
+      mockParser.emit('end');
+    });
+
+    it('does not call the onError callback despite, polymer-element not being used', () => {
+      expect(onError).not.toHaveBeenCalled();
+    });
+  })
 });
