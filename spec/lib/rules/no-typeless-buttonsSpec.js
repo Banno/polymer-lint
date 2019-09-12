@@ -15,7 +15,9 @@ describe('no-typless-buttons', () => {
       // <button>
       mockParser.emit('startTag', 'button', [], true, { attrs: {} });
       expect(onError).toHaveBeenCalled();
+    });
 
+    it('it calls the onError callback when type is not one of the attributes', () => {
       // <button id="test">
       mockParser.emit('startTag', 'button',
       [ { name: 'id', value: 'test' } ], false,
@@ -29,7 +31,9 @@ describe('no-typless-buttons', () => {
       [ { name: 'type', value: 'button' } ], false,
       { attrs: { type: { line: 1, col: 9 } } });
       expect(onError).not.toHaveBeenCalled();
+    });
 
+    it('it does not call the onError callback when type is one of the attributes', () => {
       // <button id="test" type="submit">
       mockParser.emit('startTag', 'button',
       [ { name: 'id', value: 'test' }, { name: 'type', value: 'submit' } ], false,
@@ -46,7 +50,9 @@ describe('no-typless-buttons', () => {
       // <jha-button>
       mockParser.emit('startTag', 'jha-button', [], true, { attrs: {} });
       expect(onError).toHaveBeenCalled();
+    });
 
+    it('it calls the onError callback when type is not one of the attributes', () => {
       // <jha-button id="test">
       mockParser.emit('startTag', 'jha-button',
       [ { name: 'id', value: 'test' } ], false,
@@ -60,7 +66,9 @@ describe('no-typless-buttons', () => {
       [ { name: 'type', value: 'button' } ], false,
       { attrs: { type: { line: 1, col: 13 } } });
       expect(onError).not.toHaveBeenCalled();
+    });
 
+    it('it does not call the onError callback when type is one of the attributes', () => {
       // <jha-button id="test" type="submit">
       mockParser.emit('startTag', 'jha-button',
       [ { name: 'id', value: 'test' }, { name: 'type', value: 'submit' } ], false,
