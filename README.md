@@ -235,6 +235,26 @@ Ensures that no `<style>` tags appear outside of `<template>` tags.
 </dom-module>
 ```
 
+#### no-typeless-buttons
+
+Ensures that a type attribute has been set on `<button>` or `<jha-button>` tags.
+
+###### OK
+
+```html
+<button type="submit">...</button>
+<button type="button">...</button>
+<jha-button type="submit">...</jha-button>
+<jha-button type="button">...</jha-button>
+```
+
+###### Error
+
+```html
+<button>...</button>
+<jha-button id="someid">...</jha-button>
+```
+
 ### Linter directives
 
 Component code can give instructions to the Linter via directives, which
