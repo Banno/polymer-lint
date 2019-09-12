@@ -72,4 +72,3 @@ describe('no-typless-buttons', () => {
     });
   });
 });
-
