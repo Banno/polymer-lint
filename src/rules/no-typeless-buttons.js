@@ -17,15 +17,10 @@ module.exports = function noTypelessButtons(context, parser, onError) {
   // Property/attribute binding
   parser.on('startTag', (name, attrs, selfClosing, location) => {
     if (BUTTON_TAGS.indexOf(name) !== -1) {
-      let hasType = false;
       for (const _ref of attrs) {
         if (_ref.name === 'type' && _ref.value) {
-          hasType = true;
+          return;
         }
-      }
-
-      if (hasType) {
-        return;
       }
 
       onError({
