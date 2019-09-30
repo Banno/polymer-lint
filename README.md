@@ -91,6 +91,22 @@ Ensures that only one-way bindings (`[[val]]`) are used.
 <p>{{val}}</p>
 ```
 
+#### no-hashtag-anchors
+
+Ensures there are no anchor elements with `href="#"`.
+
+###### OK
+
+```html
+<a href="#anchor">Skip to anchor</a>
+```
+
+###### Error
+
+```html
+<a href="#">Skip to anchor</a>
+```
+
 #### no-missing-import
 
 Ensures that all components that are used have been imported.
